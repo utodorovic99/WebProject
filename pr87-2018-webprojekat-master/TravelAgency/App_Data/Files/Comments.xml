@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<COMMENTS>
+  <COMMENT deleted="0" status="ap">
+    <UID>ugljesaTour</UID>
+    <AID>2</AID>
+    <TXT>Veoma kvalitetan, sadrzajan i povoljan aranzman</TXT>
+    <RATING>5</RATING>
+  </COMMENT>
+  <COMMENT deleted="0" status="ap">
+    <UID>ugljesaTour</UID>
+    <AID>2</AID>
+    <TXT>Neopravdano skup, netacno prezentovan.</TXT>
+    <RATING>1</RATING>
+  </COMMENT>
+  <COMMENT deleted="0" status="dc">
+    <UID>ugljesaTour</UID>
+    <AID>2</AID>
+    <TXT>Odbijen komentar.</TXT>
+    <RATING>1</RATING>
+  </COMMENT>
+  <COMMENT deleted="0" status="pd">
+    <UID>ugljesaTour</UID>
+    <AID>2</AID>
+    <TXT>Ceka na odobrenje.</TXT>
+    <RATING>1</RATING>
+  </COMMENT>
+</COMMENTS>

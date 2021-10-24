@@ -1,0 +1,249 @@
+﻿<html>
+
+<head>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+    <script type="text/javascript" src="~/Scripts/LoginRegister.js"></script>
+
+    <link rel="stylesheet" href="~/Content/Site.css" />
+    <link rel="stylesheet" href="~/Content/LoginRegister.css" />
+    <link rel="stylesheet" href="~/Content/NavBar.css" />
+    <link rel="stylesheet" href="~/Content/v6.6.1-dist/ol.css" type="text/css" />
+    <style>
+        .map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+    <script type="text/javascript" src="~/Content/v6.6.1-dist/ol.js"></script>
+
+</head>
+
+<body style="background-image:url(../../Content/Images/summer.jpg); background-attachment:fixed; ">
+
+    <div class="container-fluid">
+
+        <nav class="navbar navbar-default">
+            <div class="container">
+
+                <div class="navbar-header">
+                    <a style="cursor:pointer;" onko class="navbar-brand" onclick='return TriggerBack()'>Back</a>
+                    <script>
+                        function TriggerBack() {
+                            $(document).ready(function () {
+                                if (history.length > 2)
+                                    history.back();
+                                else
+                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                            });
+                        }
+                    </script>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div id="login_reg_row" class="col-md-3 col-md-offset-0">
+        <div class="panel panel-login" style="width:350%;">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h3 id="formTitle"></h3>
+                        <form id="register-form" action="" method="post" role="form">
+                            <table>
+                                <tr>
+                                    <td style="padding-right:3%;">
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="nameForm">Name: </label>
+                                            <input type="text" name="nameForm" id="nameForm" tabindex="1" class="form-control" placeholder="Name" value="" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                    <td style="padding-right:3%;">
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="maxGuesstsForm">Capacity: </label>
+                                            <input type="text" name="maxGuesstsForm" id="maxGuesstsForm" tabindex="1" class="form-control" placeholder="Cpacity" value="" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                    <td style="padding-right:7%;">
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="priceForm">Price: </label>
+                                            <input type="text" name="priceForm" id="priceForm" tabindex="1" class="form-control" placeholder="Price" value="" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                    <td style="padding-right:7%;">
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="petsAllowed">Pet Friendly: </label>
+                                            <input type="checkbox" name="petsAllowed" id="petsAllowed" tabindex="1" class="form-control" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                    <td style="padding-right:3%;">
+                                        <div class="form-group" style="padding-right:30%;">
+                                            <label style="font:x-large; color:royalblue;" id="selectAccommodationLbl" for="selectAccommodation">For Accommodation:</label>
+                                            <select name="selectAccommodation" id="selectAccommodation" tabindex="1">
+                                            </select>
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+
+                                    <td colspan="3" align="center">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-sm-6 col-sm-offset-3">
+                                                    <input onclick="HandleSubmitClick()" type="button" name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Submit" style="align-self:center;">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                            </table>
+
+                            <script>
+                                function AccommodationUnit(name, capacity, price, petFriendly) {
+                                    this.uID = name;
+                                    this.maxGuessts = capacity;
+                                    this.petAllowed = petFriendly;
+                                    this.price = price;      
+                                }
+
+                                function ValidateUnit(name, capacity, price)
+                                {
+                                    let errStr="";
+                                    if (name == "")     errStr     += "Empty Name field;\n";
+                                    if (capacity == "") errStr += "Empty Capacity field;\n";
+                                    else
+                                    {
+                                        if (capacity < 1) errStr += "Capacity must be g.t. 0 ;\n";
+                                    }
+                                    if (price == "") errStr += "Empty Price field;\n";
+                                    else
+                                    {
+                                        if (price < 1) errStr += "Price must be g.t. 0 ;\n";
+                                    }
+                                    return errStr;
+                                }
+
+                                var parts;
+                                function HandleSubmitClick()
+                                {
+                                    let name = $("#nameForm").val();
+                                    let capacity = $("#maxGuesstsForm").val();
+                                    let price = $("#priceForm").val();
+                                    let petFriendly = $("#petsAllowed").val();
+
+                                    let errStr="";
+                                    if ((errStr = ValidateUnit(name, capacity, price)) == "") {
+
+                                        if (window.localStorage.getItem('operation') == 'up')
+                                        {
+                                            $.ajax({
+                                                type: "POST",
+                                                url: "/api/accommodation/updateACUnit/" + parts[3] + "/" + parts[4],
+                                                data: JSON.stringify(new AccommodationUnit(name, capacity, price, petFriendly)),
+                                                contentType: "application/json",
+                                                dataType: "text",
+                                                headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                                success: function (data, status) {
+                                                    alert("Success");
+                                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                                                },
+                                                error: function (jqXhr, textStatus, errorMessage) {
+                                                    alert("Creating accommodation unit failed with error: " + jqXhr.responseText);
+                                                }
+
+                                            });
+                                        }
+                                        else if (window.localStorage.getItem('operation') == 'tn')
+                                        {
+
+                                            $.ajax({
+                                                type: "POST",
+                                                url: "/api/accommodation/addNewACUnit/" + $("#selectAccommodation").val(),
+                                                data: JSON.stringify(new AccommodationUnit(name, capacity, price, petFriendly)),
+                                                contentType: "application/json",
+                                                dataType: "text",
+                                                headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                                success: function (data, status) {
+                                                    alert("Success");
+                                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                                                },
+                                                error: function (jqXhr, textStatus, errorMessage) {
+                                                    alert("Updating accommodation unit failed with error: " + jqXhr.responseText);
+                                                }
+
+                                            });
+                                        }
+                                    }
+                                    else
+                                        alert("Failed with error: "+errStr);
+                                }
+
+                                $(document).ready(function ()
+                                {
+      
+                                    if (window.localStorage.getItem('operation') == 'tn')
+                                    {
+                                        document.getElementById("formTitle").innerHTML = "Create accommodation unit: ";
+
+                                        $.ajax({
+                                            type: "GET",
+                                            url: "/api/accommodations/getNames",
+                                            headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                            success: function (data, status) {
+                                                let newHtml = "";
+                                                for (unit in data)
+                                                    newHtml+="<option value=\""+data[unit]+"\">"+data[unit]+"</option>";
+                                                
+                                                document.getElementById("selectAccommodation").innerHTML = newHtml;
+                                            },
+                                            error: function (jqXhr, textStatus, errorMessage) {
+                                                alert("Error loading accommodations: " + jqXhr.responseText);
+                                            }
+                                        });
+                                    }
+                                    else if (window.localStorage.getItem('operation') == 'up')
+                                    {
+                                        document.getElementById("formTitle").innerHTML = "Modify accommodation unit: ";
+                                        document.getElementById("selectAccommodation").remove();
+                                        document.getElementById("selectAccommodationLbl").remove();
+                                        parts = window.localStorage.getItem('targetData').split('_');
+
+                                        $.ajax({
+                                            type: "GET",
+                                            url: "/api/accommodation/getACUnit/"+parts[3]+"/"+parts[4],
+                                            headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                            success: function (data, status) {
+
+                                                $("#nameForm").val(data.UID);
+                                                $("#maxGuesstsForm").val(data.MaxGuessts);
+                                                $("#priceForm").val(data.Price);
+                                                $("#petsAllowed").val(data.PetAllowed);
+                                            },
+                                            error: function (jqXhr, textStatus, errorMessage) {
+                                                alert("Error loading original data: " + jqXhr.responseText);
+                                            }
+                                        });
+                                    }
+
+                                });
+                            </script>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+

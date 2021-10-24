@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ARRANGEMENTS>
+  <ARRANGEMENT deleted="0">
+    <AID>0</AID>
+    <!--ID aranzmana-->
+    <NAME>Sutomore 7 Dana</NAME>
+    <TYPE>DP</TYPE>
+    <TRANSPORT>bus</TRANSPORT>
+    <LOCATION>Crna Gora</LOCATION>
+    <DATESTART>21/09/2021</DATESTART>
+    <DATESTOP>28/09/2021</DATESTOP>
+    <MEETINGSPOT>
+      <ADDRESS>Bulevar Despota </ADDRESS>
+      <GEOLONGITUDE>19.833549</GEOLONGITUDE>
+      <GEOLATITUDE>45.267136</GEOLATITUDE>
+    </MEETINGSPOT>
+    <MEETINGTIME>09:00</MEETINGTIME>
+    <MAXPASSENGERS>60</MAXPASSENGERS>
+    <DESC>Veoma povoljan i sadrzajan aranzman</DESC>
+    <PROGRAM>Posjeta Sarajevu, Mostaru, Trebinju, Dolazak u Sutomore 1 dan. Obilazak manastira Ostrog u povratku. </PROGRAM>
+    <POSTERURL>http://localhost:62468/Content/Images/Budva_XXL-870x400.jpg</POSTERURL>
+    <!--Lista smjestaja koji se nude u tom aranzmanu (npr.2 hotela 4 vile)-->
+    <ACCOMMODATIONS>
+      <AC_ID deleted="0">0</AC_ID>
+      <AC_ID deleted="0">1</AC_ID>
+    </ACCOMMODATIONS>
+    <!--Opis svakog smjestaja se nalazi u Accommodations-->
+  </ARRANGEMENT>
+  <ARRANGEMENT deleted="0">
+    <AID>1</AID>
+    <!--ID aranzmana-->
+    <NAME>Budva 7 Dana Mod</NAME>
+    <TYPE>EP</TYPE>
+    <TRANSPORT>airplane</TRANSPORT>
+    <LOCATION>Crna Gora Mod</LOCATION>
+    <DATESTART>23/09/2021</DATESTART>
+    <DATESTOP>30/09/2021</DATESTOP>
+    <MEETINGSPOT>
+      <ADDRESS>Bulevar Despota Mod</ADDRESS>
+      <GEOLONGITUDE>19.8434349452434</GEOLONGITUDE>
+      <GEOLATITUDE>45.2387605873787</GEOLATITUDE>
+    </MEETINGSPOT>
+    <MEETINGTIME>05:00</MEETINGTIME>
+    <MAXPASSENGERS>32</MAXPASSENGERS>
+    <DESC>Veoma povoljan i sadrzajan aranzman pogodan za mladje osobe. Mod</DESC>
+    <PROGRAM>Privatna zurka i nastup Bojana Tomovica, ukljucen u cijenu. Mod</PROGRAM>
+    <POSTERURL>http://localhost:62468/Content/Images/42442.png</POSTERURL>
+    <!--Lista smjestaja koji se nude u tom aranzmanu (npr.2 hotela 4 vile)-->
+    <ACCOMMODATIONS>
+      <AC_ID deleted="0">2</AC_ID>
+      <AC_ID deleted="0">3</AC_ID>
+      <AC_ID deleted="0">5</AC_ID>
+      <AC_ID deleted="0">0</AC_ID>
+    </ACCOMMODATIONS>
+    <!--Opis svakog smjestaja se nalazi u Accommodations-->
+  </ARRANGEMENT>
+  <ARRANGEMENT deleted="0">
+    <AID>2</AID>
+    <!--ID aranzmana-->
+    <NAME>Sutomore 7 Dana Pocetak Leta</NAME>
+    <TYPE>DP</TYPE>
+    <TRANSPORT>bus</TRANSPORT>
+    <LOCATION>Crna Gora</LOCATION>
+    <DATESTART>03/07/2021</DATESTART>
+    <DATESTOP>10/07/2021</DATESTOP>
+    <MEETINGSPOT>
+      <ADDRESS>Bulevar Despota </ADDRESS>
+      <GEOLONGITUDE>19.833549</GEOLONGITUDE>
+      <GEOLATITUDE>45.267136</GEOLATITUDE>
+    </MEETINGSPOT>
+    <MEETINGTIME>09:00</MEETINGTIME>
+    <MAXPASSENGERS>60</MAXPASSENGERS>
+    <DESC>Veoma povoljan i sadrzajan aranzman za pocetak ljeta</DESC>
+    <PROGRAM>Posjeta Sarajevu, Mostaru, Trebinju, Dolazak u Sutomore 1 dan. Obilazak manastira Ostrog u povratku. </PROGRAM>
+    <POSTERURL>http://localhost:62468/Content/Images/Budva_XXL-870x400.jpg</POSTERURL>
+    <!--Lista smjestaja koji se nude u tom aranzmanu (npr.2 hotela 4 vile)-->
+    <ACCOMMODATIONS>
+      <AC_ID deleted="0">0</AC_ID>
+    </ACCOMMODATIONS>
+    <!--Opis svakog smjestaja se nalazi u Accommodations-->
+  </ARRANGEMENT>
+  <ARRANGEMENT deleted="0">
+    <AID>3</AID>
+    <!--ID aranzmana-->
+    <NAME>Budva 7 Dana Trenutno</NAME>
+    <TYPE>FP</TYPE>
+    <TRANSPORT>minivan</TRANSPORT>
+    <LOCATION>Crna Gora</LOCATION>
+    <DATESTART>15/08/2021</DATESTART>
+    <DATESTOP>22/08/2021</DATESTOP>
+    <MEETINGSPOT>
+      <ADDRESS>Bulevar Despota </ADDRESS>
+      <GEOLONGITUDE>19.833549</GEOLONGITUDE>
+      <GEOLATITUDE>45.267136</GEOLATITUDE>
+    </MEETINGSPOT>
+    <MEETINGTIME>05:00</MEETINGTIME>
+    <MAXPASSENGERS>30</MAXPASSENGERS>
+    <DESC>Veoma povoljan i sadrzajan aranzman pogodan za mladje osobe</DESC>
+    <PROGRAM>Privatna zurka i nastup Bojana Tomovica, ukljucen u cijenu. </PROGRAM>
+    <POSTERURL>http://localhost:62468/Content/Images/Budva_XXL-870x400.jpg</POSTERURL>
+    <!--Lista smjestaja koji se nude u tom aranzmanu (npr.2 hotela 4 vile)-->
+    <ACCOMMODATIONS>
+      <AC_ID deleted="0">2</AC_ID>
+      <AC_ID deleted="0">3</AC_ID>
+    </ACCOMMODATIONS>
+    <!--Opis svakog smjestaja se nalazi u Accommodations-->
+  </ARRANGEMENT>
+  <ARRANGEMENT deleted="0">
+    <AID>4</AID>
+    <NAME>NewArrangement</NAME>
+    <TYPE>EP</TYPE>
+    <TRANSPORT>airplane</TRANSPORT>
+    <LOCATION>NewLocation</LOCATION>
+    <DATESTART>15/09/2021</DATESTART>
+    <DATESTOP>30/09/2021</DATESTOP>
+    <MEETINGSPOT>
+      <ADDRESS>NewAddress</ADDRESS>
+      <GEOLATITUDE>55.7566187404691</GEOLATITUDE>
+      <GEOLONGITUDE>37.6216039291175</GEOLONGITUDE>
+    </MEETINGSPOT>
+    <MEETINGTIME>09:14</MEETINGTIME>
+    <MAXPASSENGERS>32</MAXPASSENGERS>
+    <DESC>NewDescription</DESC>
+    <PROGRAM>NewProgramm</PROGRAM>
+    <POSTERURL>http://localhost:62468/Content/Images/garrett-parker-DlkF4-dbCOU-unsplash.jpg</POSTERURL>
+    <ACCOMMODATIONS />
+  </ARRANGEMENT>
+  <ARRANGEMENT deleted="0">
+    <AID>5</AID>
+    <NAME>NewName</NAME>
+    <TYPE>EP</TYPE>
+    <TRANSPORT>airplane</TRANSPORT>
+    <LOCATION>NewLocation</LOCATION>
+    <DATESTART>18/09/2021</DATESTART>
+    <DATESTOP>30/09/2021</DATESTOP>
+    <MEETINGSPOT>
+      <ADDRESS>Newaddress</ADDRESS>
+      <GEOLATITUDE>40.6545996260835</GEOLATITUDE>
+      <GEOLONGITUDE>22.9336985994687</GEOLONGITUDE>
+    </MEETINGSPOT>
+    <MEETINGTIME>14:55</MEETINGTIME>
+    <MAXPASSENGERS>32</MAXPASSENGERS>
+    <DESC>NewDesciption</DESC>
+    <PROGRAM>ProgramNew</PROGRAM>
+    <POSTERURL>http://localhost:62468/Content/Images/default.jpg</POSTERURL>
+    <ACCOMMODATIONS />
+  </ARRANGEMENT>
+</ARRANGEMENTS>

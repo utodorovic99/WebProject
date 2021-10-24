@@ -1,0 +1,537 @@
+﻿<html>
+
+<head>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+    <script type="text/javascript" src="~/Scripts/LoginRegister.js"></script>
+
+    <link rel="stylesheet" href="~/Content/Site.css" />
+    <link rel="stylesheet" href="~/Content/LoginRegister.css" />
+    <link rel="stylesheet" href="~/Content/NavBar.css" />
+    <link rel="stylesheet" href="~/Content/v6.6.1-dist/ol.css" type="text/css" />
+    <style>
+        .map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+    <script type="text/javascript" src="~/Content/v6.6.1-dist/ol.js"></script>
+
+</head>
+
+<body style="background-image:url(../../Content/Images/summer.jpg); background-attachment:fixed; ">
+
+    <div class="container-fluid">
+
+        <nav class="navbar navbar-default">
+            <div class="container">
+
+                <div class="navbar-header">
+                    <a style="cursor:pointer;" onko class="navbar-brand" onclick='return TriggerBack()'>Back</a>
+                    <script>
+                        function TriggerBack() {
+                            $(document).ready(function () {
+                                if (history.length > 2)
+                                    history.back();
+                                else
+                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                            });
+                        }
+                    </script>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div id="login_reg_row" class="col-md-3 col-md-offset-0">
+        <div class="panel panel-login" style="width:350%;">
+            <div class="panel-body">
+                <div class="row">
+                        <div class="col-lg-8">
+                            <h3 id="formTitle">Create arrangement</h3>
+                            <form id="register-form" action="" method="post" role="form">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <div class="form-group">
+                                                <label style="font:x-large; color:royalblue;" for="nameForm">Name: </label>
+                                                <input type="text" name="nameForm" id="nameForm" tabindex="1" class="form-control" placeholder="Name" value="" style="width:100%">
+                                            </div>
+                                        </td>
+
+                                        <td style="padding-left:7%;">
+                                            <div class="form-group">
+                                                <label style="font:x-large; color:royalblue;" for="new_type">Type:</label>
+                                                <select name="new_type" id="new_type" tabindex="1">
+                                                    <option value="EP">European Plan (EP)</option>
+                                                    <option value="B&B">Bed &amp; Breakfast (B&amp;B)</option>
+                                                    <option value="DP">Demi Pansion (DP)</option>
+                                                    <option value="FP">Full Pansion (FP)</option>
+                                                </select>
+                                            </div>
+                                        </td>
+
+                                        <td style="padding-left:7%;">
+                                            <div class="form-group">
+                                                <label style="font:x-large; color:royalblue;" for="new_transport">Transport:</label>
+                                                <select name="new_transport" id="new_transport" tabindex="1">
+                                                    <option value="airplane">Airplane</option>
+                                                    <option value="ship">Ship</option>
+                                                    <option value="boat">Boat</option>
+                                                    <option value="train">Train</option>
+                                                    <option value="bus">Bus</option>
+                                                    <option value="minivan">Minivan</option>
+                                                    <option value="car">Car</option>
+                                                    <option value="combined">Combined</option>
+                                                </select> 
+                                            </div>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <div class="form-group">
+                                                <label style="font:x-large; color:royalblue;" for="locationForm">Location: </label>
+                                                <input type="text" name="locationForm" id="locationForm" tabindex="1" class="form-control" placeholder="Location" value="" style="width:100%">
+                                            </div>
+                                        </td>
+
+                                        <td style="padding-left:7%;">
+                                            <div class="form-group">
+                                                <label style="font:x-large; color:royalblue;" for="from_date">Start date:</label>
+                                                <input type="date" name="from_date" id="from_date" tabindex="1" placeholder="dd-mm-yyyy" value="">
+                                            </div>
+                                        </td>
+
+                                        <td style="padding-left:7%;">
+                                            <div class="form-group">
+                                                <label style="font:x-large; color:royalblue;" for="till_date">Stop date:</label>
+                                                <input type="date" name="till_date" id="till_date" tabindex="1" placeholder="dd-mm-yyyy" value="">
+                                            </div>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="3">
+                                            <div id="meetingSpotMap" class="map"></div>
+                                            <script>
+                                                var latLong=undefined;
+
+                                                $(document).load()
+                                                {
+                                                    $(document).ready(function ()
+                                                    {                                                    
+                                                        let  maxValueYear = '@DateTime.Now.Year.ToString()';
+                                                        let  maxValueMonth= @DateTime.Now.Month.ToString();
+                                                        let  maxValueDay= @DateTime.Now.Day.ToString();
+
+                                                        let minValueYear = '@DateTime.Now.AddYears(1).Year.ToString()';
+                                                        let minValueMonth= @DateTime.Now.AddYears(1).Month.ToString();
+                                                        let minValueDay= @DateTime.Now.AddYears(1).Day.ToString();
+
+                                                        if(minValueMonth<10) {minValueMonth="0"+minValueMonth}
+                                                        if(minValueDay<10)   {minValueDay="0"+minValueDay}
+
+                                                        if(maxValueMonth<10) {maxValueMonth="0"+maxValueMonth}
+                                                        if(maxValueDay<10)   {maxValueDay="0"+maxValueDay}
+
+                                                        $("#from_date").attr("min", maxValueYear + "-" + maxValueMonth + "-" + maxValueDay);
+                                                        $("#from_date").attr("max", minValueYear + "-" + minValueMonth + "-" + minValueDay);
+                                                        $("#till_date").attr("min", maxValueYear + "-" + maxValueMonth + "-" + maxValueDay);
+                                                        $("#till_date").attr("max", minValueYear + "-" + minValueMonth + "-" + minValueDay);
+                                                    });
+                                                }
+                                                ///////////////////
+
+                                                var layer= undefined;
+                                                var map=undefined;
+                                                $(document).ready(function ()
+                                                {
+                                                    map = new ol.Map(
+                                                    {
+                                                        target: "meetingSpotMap",
+                                                        layers: [new ol.layer.Tile({ source: new ol.source.OSM() })],
+                                                        view: new ol.View(
+                                                            {
+                                                                center: ol.proj.fromLonLat(['22.933698599468684', '40.654599626083495']),
+                                                                zoom: 16
+                                                            })
+                                                    });
+
+                                                    let ppoint;
+                                                    layer = new ol.layer.Vector({
+                                                        source: new ol.source.Vector({
+                                                            features: [
+                                                                new ol.Feature({
+                                                                    geometry: (point=new ol.geom.Point(ol.proj.fromLonLat(['22.933698599468684', '40.654599626083495'])))
+                                                                })
+                                                            ]
+                                                        })
+                                                    });
+                                                    map.addLayer(layer)
+                                                    latLong=ol.proj.transform(point.flatCoordinates, 'EPSG:3857', 'EPSG:4326');
+
+                                                    map.on("contextmenu", function (event) {
+
+                                                        event.preventDefault()
+
+                                                        latLong = ol.proj.transform(event.coordinate, 'EPSG:3857', 'EPSG:4326');        
+                                                        map.removeLayer(layer);
+
+                                                        layer = new ol.layer.Vector({
+                                                            source: new ol.source.Vector({
+                                                                features: [
+                                                                    new ol.Feature({
+                                                                        geometry: new ol.geom.Point(ol.proj.fromLonLat([latLong[0], latLong[1]]))
+                                                                    })
+                                                                ]
+                                                            })
+                                                        });
+                                                        map.addLayer(layer)
+                                                                                                         
+                                                    });
+                                                });
+                                            </script>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <div class="form-group">
+                                                <label style="font:x-large; color:royalblue;" for="address">Address:</label>
+                                                <input type="text" name="address" id="address" tabindex="1" class="form-control" placeholder="Address" value="" style="width:100%">
+                                            </div>
+                                        </td>
+
+                                        <td style="padding-left:7%;">
+                                            <div class="form-group">
+                                                <label style="font:x-large; color:royalblue;" for="meetingTime">Time:</label>
+                                                <input type="time" id="time" name="time" required>
+                                            </div>
+                                        </td> 
+
+                                        <td>
+                                            <div class="form-group">
+                                                <label style="font:x-large; color:royalblue;" for="capacity">Capacity:</label>
+                                                <input type="text" name="capacity" id="capacity" tabindex="1" class="form-control" placeholder="Capacity" value="" style="width:100%">
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="form-group">
+                                                <label style="font:x-large; color:royalblue;" for="description">Description:</label>
+                                                <textarea class="form-control" style="resize:none; min-width:100%;" rows="4" cols="50" id="description"></textarea>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="form-group">
+                                                <label style="font:x-large; color:royalblue;" for="program">Program:</label>
+                                                <textarea class="form-control" style="resize:none; min-width:100%;" rows="4" cols="50" id="program"></textarea>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <label for="image">Poster:</label>
+                                            <input type="file"
+                                                   id="poster" name="poster"
+                                                   accept="image/png, image/jpeg">
+                                            <img id="posterPrew" style="width:50%; height:50%; padding-top:3%;"/>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+
+                                        <td colspan="3" align="center">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-sm-6 col-sm-offset-3">
+                                                        <input type="button" name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Submit" style="align-self:center;">
+                                                        <script>
+
+                                                            function Location(address, geoLongitude, geoLatitude)
+                                                            {
+                                                                this.address =address;
+                                                                this.geoLongitude=geoLongitude;
+                                                                this.geoLatitude= geoLatitude;
+                                                            }
+
+                                                            function Arrangement(name, type, transport, location, datestart, datestop, meetingSpot, meetingTime, 
+                                                                                 maxPassengers, desc, program, posterURL, accommodations) 
+                                                            {
+
+                                                                this.ReformatDateTime = function (date) {
+                                                                    let parts = date.split('-');
+                                                                    return parts[2] + "/" + parts[1]+"/" + parts[0];
+                                                                }
+
+                                                                this.name = name;
+                                                                this.type = type;
+                                                                this.transport = transport;
+                                                                this.locationn=location;
+                                                                this.datestart =this.ReformatDateTime(datestart);
+                                                                this.datestop = this.ReformatDateTime(datestop);
+                                                                this.meetingSpot = meetingSpot;
+                                                                this.meetingTime = meetingTime;
+                                                                this.maxPassengers = maxPassengers;
+                                                                this.desc = desc;
+                                                                this.program = program;
+                                                                this.posterURL=posterURL;
+                                                                this.accommodations=accommodations;
+                                                            }
+
+                                                            function ValidateCreateParams(name, location, address, timeStart, capacity,
+                                                                                            dateStart, dateStop, geoLongitude, geoLatitude)
+                                                            {
+                                                                let outStr="";
+                                                                if(name == "") outStr+="Empty name field;\n";
+                                                                else
+                                                                {
+                                                                    $.ajax({
+                                                                        type: "GET",
+                                                                        url: "/api/arrangements/isReserved/"+name,
+                                                                        headers :{'Authorization' : window.localStorage.getItem('TALoginToken')},
+                                                                        success: function(data, status)
+                                                                        {
+                                                                            if(data==true) outStr+="Name already used; \n";
+                                                                        },
+                                                                        error: function(jqXhr, textStatus, errorMessage)
+                                                                        {
+                                                                            outStr+="Server not responding; \n";
+                                                                        }
+                                                                    });
+                                                                }
+
+                                                                if(location == "") outStr+="Empty location field;\n";
+                                                                if(address == "") outStr+="Empty address field;\n";
+                                                                if(timeStart == "") outStr+="Meeting time not defined;\n";
+                                                                if(capacity == "") outStr+="Empty capacity field;\n";
+                                                                else               outStr+=isNaN(capacity)? "Capacity is not a number;\n": "";
+                                                                
+                                                                if(dateStart == "") outStr+="Starting date not defined;\n";
+                                                                if(dateStop == "") outStr+="Ending date not defined;\n";
+                                                                if(dateStart != "" && dateStop != "")
+                                                                {
+                                                                    let dateStartParts = dateStart.split('/');
+                                                                    let dateStopParts = dateStop.split('/');
+                                                                    let triggered=false;
+                                                                    if(dateStartParts[2]>dateStop[2])   triggered = true;       // Godina (iako se ne moze desiti zbog ogranicenja)
+                                                                    else if(dateStartParts[1]==dateStop[1])
+                                                                    {
+                                                                        if(dateStartParts[0]>dateStop[0])   triggered = true;
+                                                                    }
+                                                                    if(triggered) outStr+="Start & Stop date missalign;\n";
+                                                                }
+
+                                                                if(geoLongitude==undefined || geoLatitude == undefined) outStr+="Meeting sport map-marker issue;\n";
+
+                                                                return outStr;
+                                                            }
+
+                                                            function SendUpdateReq(updateTarget, arrangement)
+                                                            {
+                                                                $.ajax({
+                                                                    type: "POST",
+                                                                    url: "/api/arrangements/update/"+updateTarget,
+                                                                    data: JSON.stringify(arrangement),
+                                                                    contentType: "application/json",
+                                                                    dataType: "text",
+                                                                    headers :{'Authorization' : window.localStorage.getItem('TALoginToken')},
+                                                                    success: function(data, status)
+                                                                    {
+                                                                        alert("Successfully updated");
+                                                                        document.location.href=window.location.protocol + "//" + window.location.host+"/Home";
+                                                                    },
+                                                                    error: function(jqXhr, textStatus, errorMessage)
+                                                                    {
+                                                                        alert("Updating failed with error: "+errorMessage);
+                                                                    }
+                                                                });
+                                                            }
+
+                                                            function SendNewArrangementReq(arrangement)
+                                                            {
+                                                                $.ajax({
+                                                                    type: "POST",
+                                                                    url: "/api/arrangements",
+                                                                    data: JSON.stringify(arrangement),
+                                                                    contentType: "application/json",
+                                                                    dataType: "text",
+                                                                    headers :{'Authorization' : window.localStorage.getItem('TALoginToken')},
+                                                                    success: function(data, status)
+                                                                    {
+                                                                        alert("Successfully added");
+                                                                        document.location.href=window.location.protocol + "//" + window.location.host+"/Home";
+                                                                    },
+                                                                    error: function(jqXhr, textStatus, errorMessage)
+                                                                    {
+                                                                        alert("Creating failed with error: "+errorMessage);
+                                                                    }
+                                                                });
+                                                            }
+
+                                                            function HandleSubmitClick () {    
+                                                                let errStr="";
+                                                                if( (errStr= ValidateCreateParams(
+                                                                    $("#nameForm").val(), $("#locationForm").val(),
+                                                                    $("#address").val(), $("#time").val(),
+                                                                    $("#capacity").val(),$("#from_date").val(),
+                                                                    $("#till_date").val(), latLong[0], latLong[1])) =="")
+                                                                {   
+                                                                    
+                                                                    let arrangement = new Arrangement(
+                                                                        $("#nameForm").val(),  
+                                                                        $("#new_type").val(),   
+                                                                        $("#new_transport").val(), 
+                                                                        $("#locationForm").val(), 
+                                                                        $("#from_date").val(), 
+                                                                        $("#till_date").val(),   
+                                                                        new Location($("#address").val(), latLong[0], latLong[1]),      
+                                                                        $("#time").val(), 
+                                                                        $("#capacity").val(),  
+                                                                        $("#description").val(), 
+                                                                        $("#program").val(),      
+                                                                        "", null);
+
+                                                                    let reader = new FileReader();
+                                                                    let file =document.querySelector('#poster').files[0];
+                                                                    if(file!=undefined)
+                                                                    {
+                                                                        reader.readAsDataURL(file);
+                                                                        reader.onload = function () {
+                                                                            //Remove encoding header from raw data and place filename before it,  separated with >
+                                                                            arrangement['posterURL']=file.name+'>'+(reader.result.replace(/^data:image\/[a-z]+;base64,/, ""));
+                                                                            if(window.localStorage.getItem('UpdateTarget')!=null)  
+                                                                                SendUpdateReq(window.localStorage.getItem('UpdateTarget'), arrangement);
+                                                                            else
+                                                                                SendNewArrangementReq(arrangement);
+                                                                            
+                                                                        };
+                                                                        reader.onerror = function (error) {
+                                                                            arrangement['posterURL']="";
+                                                                            alert("Loading image failed, continuing..");
+                                                                            if(window.localStorage.getItem('UpdateTarget')!=null)  
+                                                                                SendUpdateReq(window.localStorage.getItem('UpdateTarget'), arrangement);
+                                                                            else
+                                                                                SendNewArrangementReq(arrangement)
+                                                                        };
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        if(window.localStorage.getItem('UpdateTarget')!=null)  
+                                                                            SendUpdateReq(window.localStorage.getItem('UpdateTarget'), arrangement);
+                                                                        else
+                                                                            SendNewArrangementReq(arrangement)
+                                                                    }
+                                                                    
+     
+                                                                }   
+                                                                else alert(errStr);
+                                                            };
+
+                                                            function setValue(inVal, dl){
+                                                                var el =0;
+                                                                for (var i=0; i<dl.options.length; i++){
+                                                                    if (dl.options[i].value == inVal){
+                                                                        el=i;
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                dl.selectedIndex = el;
+                                                            }
+
+                                                            function RenderUpdateEnvronment(arrangement)
+                                                            {
+                                                                document.getElementById('formTitle').innerHTML="Update arrangement: "+arrangement;
+
+                                                                $.ajax({
+                                                                    type: "GET",
+                                                                    url: "/api/arrangements/"+arrangement,
+                                                                    data: JSON.stringify(arrangement),
+                                                                    contentType: "application/json",
+                                                                    dataType: "text",
+                                                                    headers :{'Authorization' : window.localStorage.getItem('TALoginToken')},
+                                                                    success: function(data, status)
+                                                                    {
+                                                                        data=JSON.parse(data);
+                                                                        $("#nameForm").val(data.Name);  
+                                                                        setValue(data.Type, document.getElementById('new_type'))
+                                                                        setValue(data.Transport, document.getElementById('new_transport'));
+                                                                        $("#locationForm").val(data.Locationn); 
+
+                                                                        let stringParts=data.DateStart.split('/');
+                                                                        $("#from_date").val(stringParts[2]+'-'+stringParts[1]+'-'+stringParts[0]); 
+                                                                        stringParts=data.DateStop.split('/');
+                                                                        $("#till_date").val(stringParts[2]+'-'+stringParts[1]+'-'+stringParts[0]);   
+                                                                        $("#address").val(data.MeetingSpot.Address);    
+                                                                        $("#time").val(data.MeetingTime); 
+                                                                        $("#capacity").val(data.MaxPassengers);  
+                                                                        $("#description").val(data.Desc); 
+                                                                        $("#program").val(data.Program);     
+
+                                                                        map.removeLayer(layer);
+                                                                        layer = new ol.layer.Vector({
+                                                                            source: new ol.source.Vector({
+                                                                                features: [
+                                                                                    new ol.Feature({
+                                                                                        geometry: (point=new ol.geom.Point(ol.proj.fromLonLat([data.MeetingSpot.GeoLongitude, data.MeetingSpot.GeoLatitude])))
+                                                                                    })
+                                                                                ]
+                                                                            })
+                                                                        });
+                                                                        map.addLayer(layer)
+                                                                        map.getView().setCenter(ol.proj.transform([data.MeetingSpot.GeoLongitude, data.MeetingSpot.GeoLatitude], 'EPSG:4326', 'EPSG:3857'));
+
+                                                                        document.getElementById('posterPrew').setAttribute('src', data.PosterURL);
+                                                                    },
+                                                                    error: function(jqXhr, textStatus, errorMessage)
+                                                                    {
+                                                                        alert("Loading original data failed with with error: "+errorMessage);
+                                                                    }
+                                                                });
+                                                            }
+
+                                                            $(document).load()
+                                                            { 
+                                                                document.getElementById("register-submit").addEventListener('click', HandleSubmitClick);
+                                                                
+                                                                //BITNO
+                                                                if(window.localStorage.getItem('UpdateTarget')!=null)
+                                                                {
+                                                                    RenderUpdateEnvronment(window.localStorage.getItem('UpdateTarget'));
+                                                                }
+                                                                    
+                                                            }
+
+                                                            $(document).ready(function(){
+                                                                $("#poster").change(function(){
+                                                                    var output = document.getElementById('posterPrew');
+                                                                    output.src = URL.createObjectURL(document.getElementById('poster').files[0]);
+                                                                });
+                                                            });
+
+                                                        </script>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+</body>
+
+</html>

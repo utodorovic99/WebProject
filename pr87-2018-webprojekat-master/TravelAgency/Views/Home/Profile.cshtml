@@ -1,0 +1,475 @@
+﻿<html>
+
+<head>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+    <script type="text/javascript" src="~/Scripts/LoginRegister.js"></script>
+
+    <link rel="stylesheet" href="~/Content/Site.css" />
+    <link rel="stylesheet" href="~/Content/LoginRegister.css" />
+    <link rel="stylesheet" href="~/Content/NavBar.css" />
+    <link rel="stylesheet" href="~/Content/v6.6.1-dist/ol.css" type="text/css" />
+    <script type="text/javascript" src="~/Content/v6.6.1-dist/ol.js"></script>
+
+</head>
+
+<body style="background-image:url(../../Content/Images/summer.jpg); background-attachment:fixed; ">
+
+    <div class="container-fluid">
+
+        <nav class="navbar navbar-default">
+            <div class="container">
+
+                <div class="navbar-header">
+                    <a style="cursor:pointer;" onko class="navbar-brand" onclick='return TriggerBack()'>Back</a>
+                    <script>
+                        function TriggerBack() {
+                            $(document).ready(function () {
+                                if (history.length > 2)
+                                    history.back();
+                                else
+                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                            });
+                        }
+                    </script>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div id="login_reg_row" class="col-md-3 col-md-offset-0">
+        <div class="panel panel-login" style="width:250%">  
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <form id="register-form" method="post" role="form">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="usernameReg">Username: </label>
+                                            <input type="text" name="username" id="usernameReg" tabindex="1" class="form-control" placeholder="Username" value="" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="emailReg">E-Mail: </label>
+                                            <input type="email" name="email" id="emailReg" tabindex="1" class="form-control" placeholder="Email Address" value="" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="passwordReg">Old Password: </label>
+                                            <input type="password" name="password" id="passwordReg" tabindex="2" class="form-control" placeholder="Old Password" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="passwordRegNew1">New Password: </label>
+                                            <input type="password" name="passwordNew1" id="passwordRegNew1" tabindex="2" class="form-control" placeholder="New Password" style="width:150%">
+                                        </div>
+                                    </td>
+
+                                </tr>
+                               
+                                
+                                <tr>
+                                    <td>
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="passwordRegNew2">Confirm Password: </label>
+                                            <input type="password" name="passwordNew2" id="passwordRegNew2" tabindex="2" class="form-control" placeholder="Confirm Password" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="nameReg">Name: </label>
+                                            <input type="text" name="name" id="nameReg" tabindex="1" class="form-control" placeholder="Name" value="" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                </tr>
+                                
+
+                                <tr>
+                                    <td>
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="surnameReg">Surname: </label>
+                                            <input type="text" name="surname" id="surnameReg" tabindex="1" class="form-control" placeholder="Surname" value="" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div style="transform:scale(0.8)">
+                                            <label style="font:x-large; color:royalblue;" for="genderRegM">Gender: </label>
+                                            <input type="radio" name="gender" id="genderRegM" tabindex="1" class="form-control" value="m">
+                                            <label for="genderRegM">Male</label>
+                                            <input type="radio" name="gender" id="genderRegF" tabindex="1" class="form-control" value="f">
+                                            <label for="genderRegF">Female</label>
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="birthdateReg">Birth Date: </label>
+                                            <input type="date" name="birthdate" id="birthdateReg" tabindex="1" class="form-control" placeholder="dd-mm-yyyy" value="" style="width:100%">
+
+                                            <script type="text/javascript">
+                                                var oldData;
+                                                function LoadOriginalData()
+                                                {
+                                                    $("#usernameReg").val(oldData['Username']);
+                                                    $("#emailReg").val(oldData['Email']);
+                                                    $("#nameReg").val(oldData['Name']);
+                                                    $("#surnameReg").val(oldData['Surname']);
+                                                    $("#passwordReg").val("");
+                                                    $("#passwordRegNew1").val("");
+                                                    $("#passwordRegNew2").val("");
+
+                                                    if(oldData['Gender']=='m')
+                                                        $('#genderRegM').click();
+                                                    else
+                                                        $('#genderRegF').click();
+
+                                                    let dateParts=oldData['BirthDate'].split('/');
+                                                    $("#birthdateReg").val(dateParts[2]+'-'+dateParts[1]+'-'+dateParts[0]);
+                                                }
+
+                                                $(document).ready(function() {
+
+                                                    let  maxValueYear = '@DateTime.Now.AddYears(-18).Year.ToString()';
+                                                    let  maxValueMonth= @DateTime.Now.AddYears(-18).Month.ToString();
+                                                    let  maxValueDay= @DateTime.Now.AddYears(-18).Day.ToString();
+
+                                                    if(maxValueMonth<10) {maxValueMonth="0"+maxValueMonth}
+                                                    if(maxValueDay<10)   {maxValueDay="0"+maxValueDay}
+
+                                                    $("#birthdateReg").attr("max", maxValueYear + "-" + maxValueMonth + "-" + maxValueDay);
+
+                                                    minValueYear = '@DateTime.Now.AddYears(-130).Year.ToString()';
+                                                    minValueMonth= @DateTime.Now.AddYears(-130).Month.ToString();
+                                                    minValueDay= @DateTime.Now.AddYears(-130).Day.ToString();
+
+                                                    if(minValueMonth<10) {minValueMonth="0"+minValueMonth}
+                                                    if(minValueDay<10)   {minValueDay="0"+minValueDay}
+
+                                                    $("#birthdateReg").attr("min", minValueYear + "-" + minValueMonth + "-" + minValueDay);
+
+                                                    $.ajax({
+                                                        type: "GET",
+                                                        url: "/api/users/"+window.localStorage.getItem('username'),
+                                                        headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                                        success: function (data, status)
+                                                        {
+                                                            oldData = $.extend( true, {}, data );
+                                                            LoadOriginalData();
+
+                                                        },
+                                                        error: function (jqXhr, textStatus, errorMessage)
+                                                        {
+                                                            alert("An error occurred while loading user data: "+jqXhr.responseText);
+                                                        }
+                                                    });
+                                                });
+                                            </script>
+
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-sm-6 col-sm-offset-3">
+                                                    <input type="button" name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Submit Changes" style="align-self:center;">
+                                                    <script>
+
+                                                    function UserUpdate(username, password, name, surname, gender, email, birthdate, passwordN1, passwordN2, usernameNew) {
+                                                    this.username = username;
+                                                    this.password = SHA256(password);
+                                                    this.name = name;
+                                                    this.surname = surname;
+                                                    this.email = email;
+                                                    this.role=oldData["Role"];
+                                                    this.gender=gender;
+                                                    this.passwordNew1=passwordN1==""? "" : SHA256(passwordN1);
+                                                    this.passwordNew2=passwordN2==""? "" : SHA256(passwordN2);
+                                                    this.usernameNew=usernameNew;
+
+                                                    this.ReformatDateTime = function (birthdate) {
+                                                        let parts = birthdate.split('-');
+                                                        return parts[2] + "/" + parts[1]+"/" + parts[0];
+                                                    };
+                                                    this.birthdate = this.ReformatDateTime(birthdate);
+
+                                                    this.Format = function () {
+                                                        return "USERNAME: " + this.username + "\n" + "PASSWORD: " + this.password + "\n" + "NAME: " + this.name + "\n" +
+                                                            "SURNAME: " + this.surname + "\n" + "EMAIL: " + this.email + "\n" + "BIRTHDATE: " + this.birthdate + "\n";
+                                                    };
+                                                }
+
+                                                function RegisterReqReport(usernameErr, emailErr, passwordErr, nameErr, surnameErr, birthDateErr, genderErr, newPassErr) {
+                                                    this.usernameErr = usernameErr;
+                                                    this.emailErr = emailErr;
+                                                    this.passwordErr = passwordErr;
+                                                    this.nameErr = nameErr;
+                                                    this.surnameErr = surnameErr;
+                                                    this.birthDateErr = birthDateErr;
+                                                    this.genderErr = genderErr;
+                                                    this.newPassErr=newPassErr;
+
+                                                    this.isValid = function () {
+                                                        return  (this.usernameErr === null &&
+                                                                this.emailErr=== null &&
+                                                                this.passwordErr === null &&
+                                                                this.newPassErr === null && this.surnameErr === null &&
+                                                                this.birthDateErr === null &&
+                                                                this.genderErr === null &&
+                                                                this.newPassErr===null);
+                                                    };
+
+                                                    this.Format = function () {
+                                                        let outStr="";
+                                                        outStr+=this.usernameErr == null ? "" : 'Username: '+this.usernameErr+'\n';
+                                                        outStr+=this.emailErr == null ? "" : 'EMail: '+this.emailErr+'\n';
+                                                        outStr+=this.passwordErr == null ? "" : 'Password: '+this.passwordErr+'\n';
+                                                        outStr+=this.nameErr == null ? "" : 'Name: '+this.nameErr+'\n';
+                                                        outStr+=this.surnameErr == null ? "" : 'Surname: '+this.surnameErr+'\n';
+                                                        outStr+=this.birthDateErr == null ? "" : 'Birth Date: '+this.birthDateErr+'\n';
+                                                        outStr+=this.genderErr == null ? "": 'Gender: '+this.genderErr+'\n';
+                                                        outStr+=this.newPassErr === null ? "": 'New Password: '+this.newPassErr+'\n';
+                                                        return outStr;
+                                                    };
+                                                }
+
+                                                function TestRegisterData(username, email, password, name, surname, birthdate, gender, passwordN1, passwordN2) {
+                                                    var report = new RegisterReqReport(null, null, null, null, null, null, null, null);
+                                                    let tmpVar = new String;
+                                                    tmpVar=username;
+                                                    if(tmpVar==null || tmpVar==="")
+                                                        report.usernameErr="Empty field"
+
+                                                    else
+                                                    {
+                                                        username = tmpVar.trim();
+                                                        if (username.length < 8)  report.usernameErr = "username must contain at least 8 charachters";
+                                                        if (username.length > 20) report.usernameErr = "username can contain max. 20 charachters";
+                                                        if (username.includes(' ')) {
+                                                            if (report.usernameErr != null) report.usernameErr += ", ";
+                                                            report.usernameErr += "no spaces allowed";
+                                                        }
+                                                    }
+
+                                                    tmpVar=password;
+                                                    if(tmpVar==="" || tmpVar==null)
+                                                        report.passwordErr="Empty field"
+                                                    else
+                                                    {
+
+                                                        password = tmpVar;
+                                                        if (password.length < 8) report.passwordErr = "password must contain at least 8 charachters";
+                                                        else if (oldData['Password']!=SHA256(password)) report.newPassErr= "invalid password"
+                                                    }
+
+                                                    tmpVar=passwordN1;
+                                                    passwordN1 = tmpVar;
+                                                    if (passwordN1.length>0 && passwordN1.length < 8) report.newPassErr = "new password must contain at least 8 charachters";
+                                                    
+
+                                                    if(report.passwordErr==null)
+                                                    {
+                                                        if( (passwordN1!="") && passwordN1!=passwordN2) report.newPassErr = "new password missmatch";
+                                                    }
+
+
+                                                    tmpVar=name;
+                                                    if(tmpVar==="" || tmpVar==null)
+                                                        report.nameErr="Empty field"
+
+                                                    else
+                                                    {
+                                                        name = tmpVar;
+                                                        if (/name/.test("^([a-z] || [A-Z])")) report.nameErr = "only letters allowed"
+                                                    }
+
+                                                    tmpVar=surname;
+                                                    if(tmpVar==="" || tmpVar==null)
+                                                    {
+                                                        report.surnameErr="Empty field"
+                                                    }
+                                                    else
+                                                    {
+                                                        surname = tmpVar;
+                                                        if (/surname/.test("^([a-z] || [A-Z])")) report.surnameErr = "only letters allowed"
+                                                    }
+
+                                                    if(gender==null)
+                                                    {
+                                                        report.genderErr="No gender selected"
+                                                    }
+
+                                                    tmpVar=birthdate;
+                                                    if (tmpVar==="mm/dd/yyyy" || tmpVar==="dd/mm/yyyy" || tmpVar==="yyyy/mm/dd") report.datetimeErr = "Empty field";
+
+                                                    //Email formatted via form
+
+                                                    return report;
+
+                                                }
+
+                                                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                                /**
+                                                * Secure Hash Algorithm (SHA256)
+                                                * http://www.webtoolkit.info/
+                                                * Original code by Angel Marin, Paul Johnston
+                                                **/
+
+                                                //code of SHA256 function
+                                                function SHA256(s) {
+                                                    var chrsz = 8; var hexcase = 0; function safe_add(x, y) { var lsw = (x & 0xFFFF) + (y & 0xFFFF); var msw = (x >> 16) + (y >> 16) + (lsw >> 16); return (msw << 16) | (lsw & 0xFFFF); }
+                                                    function S(X, n) { return (X >>> n) | (X << (32 - n)); }
+                                                    function R(X, n) { return (X >>> n); }
+                                                    function Ch(x, y, z) { return ((x & y) ^ ((~x) & z)); }
+                                                    function Maj(x, y, z) { return ((x & y) ^ (x & z) ^ (y & z)); }
+                                                    function Sigma0256(x) { return (S(x, 2) ^ S(x, 13) ^ S(x, 22)); }
+                                                    function Sigma1256(x) { return (S(x, 6) ^ S(x, 11) ^ S(x, 25)); }
+                                                    function Gamma0256(x) { return (S(x, 7) ^ S(x, 18) ^ R(x, 3)); }
+                                                    function Gamma1256(x) { return (S(x, 17) ^ S(x, 19) ^ R(x, 10)); }
+                                                    function core_sha256(m, l) {
+                                                        var K = new Array(0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5, 0x3956C25B, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5, 0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3, 0x72BE5D74, 0x80DEB1FE, 0x9BDC06A7, 0xC19BF174, 0xE49B69C1, 0xEFBE4786, 0xFC19DC6, 0x240CA1CC, 0x2DE92C6F, 0x4A7484AA, 0x5CB0A9DC, 0x76F988DA, 0x983E5152, 0xA831C66D, 0xB00327C8, 0xBF597FC7, 0xC6E00BF3, 0xD5A79147, 0x6CA6351, 0x14292967, 0x27B70A85, 0x2E1B2138, 0x4D2C6DFC, 0x53380D13, 0x650A7354, 0x766A0ABB, 0x81C2C92E, 0x92722C85, 0xA2BFE8A1, 0xA81A664B, 0xC24B8B70, 0xC76C51A3, 0xD192E819, 0xD6990624, 0xF40E3585, 0x106AA070, 0x19A4C116, 0x1E376C08, 0x2748774C, 0x34B0BCB5, 0x391C0CB3, 0x4ED8AA4A, 0x5B9CCA4F, 0x682E6FF3, 0x748F82EE, 0x78A5636F, 0x84C87814, 0x8CC70208, 0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2); var HASH = new Array(0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A, 0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19); var W = new Array(64); var a, b, c, d, e, f, g, h, i, j; var T1, T2; m[l >> 5] |= 0x80 << (24 - l % 32); m[((l + 64 >> 9) << 4) + 15] = l; for (var i = 0; i < m.length; i += 16) {
+                                                            a = HASH[0]; b = HASH[1]; c = HASH[2]; d = HASH[3]; e = HASH[4]; f = HASH[5]; g = HASH[6]; h = HASH[7]; for (var j = 0; j < 64; j++) { if (j < 16) W[j] = m[j + i]; else W[j] = safe_add(safe_add(safe_add(Gamma1256(W[j - 2]), W[j - 7]), Gamma0256(W[j - 15])), W[j - 16]); T1 = safe_add(safe_add(safe_add(safe_add(h, Sigma1256(e)), Ch(e, f, g)), K[j]), W[j]); T2 = safe_add(Sigma0256(a), Maj(a, b, c)); h = g; g = f; f = e; e = safe_add(d, T1); d = c; c = b; b = a; a = safe_add(T1, T2); }
+                                                            HASH[0] = safe_add(a, HASH[0]); HASH[1] = safe_add(b, HASH[1]); HASH[2] = safe_add(c, HASH[2]); HASH[3] = safe_add(d, HASH[3]); HASH[4] = safe_add(e, HASH[4]); HASH[5] = safe_add(f, HASH[5]); HASH[6] = safe_add(g, HASH[6]); HASH[7] = safe_add(h, HASH[7]);
+                                                        }
+                                                        return HASH;
+                                                    }
+                                                    function str2binb(str) {
+                                                        var bin = Array(); var mask = (1 << chrsz) - 1; for (var i = 0; i < str.length * chrsz; i += chrsz) { bin[i >> 5] |= (str.charCodeAt(i / chrsz) & mask) << (24 - i % 32); }
+                                                        return bin;
+                                                    }
+                                                    function Utf8Encode(string) {
+                                                        string = string.replace(/\r\n/g, '\n'); var utftext = ''; for (var n = 0; n < string.length; n++) {
+                                                            var c = string.charCodeAt(n); if (c < 128) { utftext += String.fromCharCode(c); }
+                                                            else if ((c > 127) && (c < 2048)) { utftext += String.fromCharCode((c >> 6) | 192); utftext += String.fromCharCode((c & 63) | 128); }
+                                                            else { utftext += String.fromCharCode((c >> 12) | 224); utftext += String.fromCharCode(((c >> 6) & 63) | 128); utftext += String.fromCharCode((c & 63) | 128); }
+                                                        }
+                                                        return utftext;
+                                                    }
+                                                    function binb2hex(binarray) {
+                                                        var hex_tab = hexcase ? '0123456789ABCDEF' : '0123456789abcdef'; var str = ''; for (var i = 0; i < binarray.length * 4; i++) {
+                                                            str += hex_tab.charAt((binarray[i >> 2] >> ((3 - i % 4) * 8 + 4)) & 0xF) +
+                                                            hex_tab.charAt((binarray[i >> 2] >> ((3 - i % 4) * 8)) & 0xF);
+                                                        }
+                                                        return str;
+                                                    }
+                                                    s = Utf8Encode(s); return binb2hex(core_sha256(str2binb(s), s.length * chrsz));
+                                                }
+
+                                                $(document).ready(function () {
+
+                                                    $('#register-submit').on('click', HandleSubmitClick);
+
+
+                                                    function HandleSubmitClick() {
+
+                                                        let username = new String;
+                                                        let email = new String;
+                                                        let password = new String;
+                                                        let name = new String;
+                                                        let surname = new String;
+                                                        let birthdate = new String;
+                                                        let gender = new String;
+
+                                                        username = $("#usernameReg").val();
+                                                        email = $("#emailReg").val();
+                                                        password = $("#passwordReg").val();
+                                                        passwordN1 = $("#passwordRegNew1").val();
+                                                        passwordN2 = $("#passwordRegNew2").val();
+                                                        name = $("#nameReg").val();
+                                                        surname = $("#surnameReg").val();
+                                                        birthdate = $("#birthdateReg").val();
+
+                                                        if ((gender = $("#genderRegM").val()) != null)
+                                                            gender = $("#genderRegM").val() === "m" ? "m" : "f";
+
+                                                        var report =TestRegisterData(username, email, password, name, surname, birthdate, gender, passwordN1, passwordN2)
+                                                        if (report.isValid()) {
+                                                            // UserUpdate(username, password, name, surname, gender, email, birthdate, passwordN1, passwordN2, usernameNew)
+                                                            let usr = new UserUpdate(oldData['Username'], password, name, surname, gender, email, birthdate, passwordN1, passwordN2, username);                                                           
+
+                                                            $.ajax({
+                                                                type: "POST",
+                                                                url: "/api/users/update",
+                                                                headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                                                data: JSON.stringify(usr),
+                                                                contentType: "application/json",
+                                                                dataType: "text",
+                                                                success: function(data, status)
+                                                                {
+                                                        
+                                                                    oldData['Name']=$("#nameReg").val();
+                                                                    oldData['Surname']=$("#surnameReg").val();
+                                                                    oldData['Username']=$("#usernameReg").val();
+                                                                    if($("#passwordRegNew1").val()!="")
+                                                                        oldData['Password']=$("#passwordRegNew1").val();
+
+                                                                    if($('#genderRegM').val()=='m')
+                                                                        oldData['Gender']='m';
+                                                                    else
+                                                                        oldData['Gender']='f';
+ 
+                                                                    oldData['BirthDate']=$("#birthdateReg").val();
+                                                                    // LAST DONE
+                                                                    window.localStorage.setItem('TALoginToken', 'Basic '+btoa(username+':'+ passwordN1!=""? SHA256(passwordN1):password));                                                                      
+                                                                    window.localStorage.setItem('username', username);
+                                                                    $("#passwordReg").val("");
+                                                                    $("#passwordRegNew1").val("");
+                                                                    $("#passwordRegNew2").val("");
+                                                                    alert("Success");
+                                                                },
+                                                                error: function (jqXhr, textStatus, errorMessage)
+                                                                {
+                                                                    alert("An error occured while updating profile"+jqXhr.responseText);
+                                                                }
+                                                            });
+
+
+                                                        }
+                                                        else {
+                                                            alert(report.Format());
+                                                        }
+
+                                                    };
+
+                                                });
+                                                    </script>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                           
+                            </table>
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
+

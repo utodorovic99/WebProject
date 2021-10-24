@@ -1,0 +1,122 @@
+﻿<html>
+
+<head>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+    <script type="text/javascript" src="~/Scripts/LoginRegister.js"></script>
+
+    <link rel="stylesheet" href="~/Content/Site.css" />
+    <link rel="stylesheet" href="~/Content/LoginRegister.css" />
+    <link rel="stylesheet" href="~/Content/NavBar.css" />
+    <link rel="stylesheet" href="~/Content/v6.6.1-dist/ol.css" type="text/css" />
+    <style>
+        .map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+    <script type="text/javascript" src="~/Content/v6.6.1-dist/ol.js"></script>
+
+</head>
+
+<body style="background-image:url(../../Content/Images/summer.jpg); background-attachment:fixed; ">
+
+    <div class="container-fluid">
+
+        <nav class="navbar navbar-default">
+            <div class="container">
+
+                <div class="navbar-header">
+                    <a style="cursor:pointer;" onko class="navbar-brand" onclick='return TriggerBack()'>Back</a>
+                    <script>
+                        function TriggerBack() {
+                            $(document).ready(function () {
+                                if (history.length > 2)
+                                    history.back();
+                                else
+                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                            });
+                        }
+                    </script>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div id="login_reg_row" class="col-md-3 col-md-offset-0">
+        <div class="panel panel-login" style="width:350%;">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h3 id="formTitle">Reservations</h3>
+                        <table id="reservationsTable" class="table"></table>
+                        <div id="detailsDiv"></div>
+                        <script>
+
+                            function HandleShowDetails(elem)
+                            {
+                                //Arranzman i accommotion
+                                let loc = elem.id.split("_");
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/api/reservations/managerTranslation/" + tmpCopy[loc[1]].AID + "/" + tmpCopy[loc[1]].AUnitID,
+                                    headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                    success: function (data, status) {
+
+                                        let newHtml = "";
+                                        newHtml = "<ul>" +
+                                                    "<li><b>USER:\t&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</b>" + tmpCopy[loc[1]].UID + "</li>" +
+                                                    "<li><b>Arrangement:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</b>" + data.ArrangementName + "</li>" +
+                                                    "<li><b>Accommodation:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</b>" + data.AccommodationName + "</li>" +
+                                                    "<li><b>Acc. Unit:&nbsp&nbsp&nbsp&nbsp</b>" + tmpCopy[loc[1]].UnitID + "</li>" +
+                                                    "<li><b>Status:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</b>" + (tmpCopy[loc[1]].Status == "a" ? "Active" : "Cancelled") + "</li>" +
+                                                 "</ul>";
+
+                                        document.getElementById("detailsDiv").innerHTML = newHtml;
+                                    },
+                                    error: function (jqXhr, textStatus, errorMessage) {
+                                        alert("Translation failed with error: " + jqXhr.responseText);
+                                    }
+                                });
+                            }
+
+                            var tmpCopy;
+                            $(document).ready(function () {
+                                //api / reservations / getForMannager
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/api/reservations/getForMannager",
+                                    headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                    success: function (data, status) {
+                                        tmpCopy = $.extend( true, {}, data );
+                                        let newHtml =
+                                            "<tr style=\"background-color:#4169E1;\">" +
+                                                "<th colspan=\"2\">User</th>"+
+                                                "<th colspan=\"2\">Acc. Unit</th>" +
+                                                "<th colspan=\"2\">Status</th>"+
+                                            "</tr>";
+                                        for(reservation in tmpCopy)
+                                        {
+                                            newHtml +=
+                                            "<tr id=\"idx_" + reservation + "\" onclick=\"HandleShowDetails(this)\" style=\"cursor:pointer;\">" +
+                                                "<td style=\"background-color:#ADFF2F;\" colspan=\"2\">" + tmpCopy[reservation].UID + "</td>" +
+                                                "<td colspan=\"2\">" + tmpCopy[reservation].UnitID + "</td>" +
+                                                "<td style=\"background-color:#ADFF2F;\" colspan=\"2\">" + (tmpCopy[reservation].Status == "a" ? "Active" : "Cancelled") + "</td>" +
+                                            "</tr>";
+                                        }
+
+                                        document.getElementById("reservationsTable").innerHTML = newHtml;
+                                    },
+                                    error: function (jqXhr, textStatus, errorMessage) {
+                                        alert("Error loading reservations for manager: " + jqXhr.responseText);
+                                    }
+                                });
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

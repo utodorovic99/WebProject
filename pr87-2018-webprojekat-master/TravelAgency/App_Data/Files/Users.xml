@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<USERS>
+  <USER deleted="0" banned="0">
+    <USERNAME>ugljesa99</USERNAME>
+    <PASSWORD>c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646</PASSWORD>
+    <NAME>Ugljesa</NAME>
+    <SURNAME>Todorovic</SURNAME>
+    <GENDER>m</GENDER>
+    <EMAIL>somemail@somedomain.com</EMAIL>
+    <BIRTHDATE>17/11/1999</BIRTHDATE>
+    <ROLE>a</ROLE>
+    <ARRANGEMENTS>
+      <AID deleted="0">5</AID>
+    </ARRANGEMENTS>
+  </USER>
+  <USER deleted="0" banned="0">
+    <USERNAME>ugljesaTourNew</USERNAME>
+    <PASSWORD>c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646</PASSWORD>
+    <NAME>Ugljesa</NAME>
+    <SURNAME>Todorovic</SURNAME>
+    <GENDER>m</GENDER>
+    <EMAIL>somemail@somedomain.com</EMAIL>
+    <BIRTHDATE>17/11/1999</BIRTHDATE>
+    <ROLE>t</ROLE>
+    <ARRANGEMENTS>
+      <AID deleted="0">0</AID>
+      <AID deleted="0">1</AID>
+      <!--Ako je turista   ID aranzmana koji je rezervisao-->
+      <!--Ako je menazdjer ID aranzmana koji je kreirao-->
+      <!--Nalazi se u Arrangements-->
+    </ARRANGEMENTS>
+  </USER>
+  <USER deleted="0" banned="0">
+    <USERNAME>ugljesaManager</USERNAME>
+    <PASSWORD>c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646</PASSWORD>
+    <NAME>Ugljesa</NAME>
+    <SURNAME>Todorovic</SURNAME>
+    <GENDER>m</GENDER>
+    <EMAIL>somemail@somedomain.com</EMAIL>
+    <BIRTHDATE>17/11/1999</BIRTHDATE>
+    <ROLE>m</ROLE>
+    <ARRANGEMENTS>
+      <AID deleted="0">0</AID>
+      <AID deleted="0">1</AID>
+      <AID deleted="0">6</AID>
+    </ARRANGEMENTS>
+  </USER>
+  <USER deleted="0" banned="0">
+    <USERNAME>Ugljesa999</USERNAME>
+    <PASSWORD>c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646</PASSWORD>
+    <NAME>Ugljesa</NAME>
+    <SURNAME>Todorovic</SURNAME>
+    <GENDER>m</GENDER>
+    <EMAIL>ugljesatodorovic@hotmail.com</EMAIL>
+    <BIRTHDATE>03/08/2003</BIRTHDATE>
+    <ROLE>t</ROLE>
+    <ARRANGEMENTS>
+      <AID deleted="0">4</AID>
+    </ARRANGEMENTS>
+  </USER>
+</USERS>

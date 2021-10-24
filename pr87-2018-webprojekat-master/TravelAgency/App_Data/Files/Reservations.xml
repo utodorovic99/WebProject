@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RESERVATIONS>
+  <RESERVATION deleted="0" timesCanceled="0">
+    <RESID>1</RESID>
+    <UID>ugljesaTourNew</UID>
+    <AID>2</AID>
+    <STATUS>a</STATUS>
+    <AUNIT_ID>0</AUNIT_ID>
+    <UNIT_ID>Soba 1</UNIT_ID>
+  </RESERVATION>
+  <RESERVATION deleted="0" timesCanceled="7">
+    <RESID>0</RESID>
+    <UID>ugljesaTourNew</UID>
+    <AID>1</AID>
+    <STATUS>a</STATUS>
+    <AUNIT_ID>2</AUNIT_ID>
+    <UNIT_ID>Soba 0 Changed</UNIT_ID>
+  </RESERVATION>
+  <RESERVATION deleted="0" timesCanceled="2">
+    <RESID>1</RESID>
+    <UID>ugljesaTourNew</UID>
+    <AID>1</AID>
+    <STATUS>c</STATUS>
+    <AUNIT_ID>2</AUNIT_ID>
+    <UNIT_ID>Soba 1</UNIT_ID>
+  </RESERVATION>
+  <RESERVATION deleted="0" timesCanceled="1">
+    <RESID>2</RESID>
+    <UID>ugljesaTourNew</UID>
+    <AID>1</AID>
+    <STATUS>c</STATUS>
+    <AUNIT_ID>3</AUNIT_ID>
+    <UNIT_ID>Apartman 0</UNIT_ID>
+  </RESERVATION>
+  <RESERVATION deleted="0" timesCanceled="1">
+    <RESID>3</RESID>
+    <UID>ugljesaTourNew</UID>
+    <AID>1</AID>
+    <STATUS>c</STATUS>
+    <AUNIT_ID>3</AUNIT_ID>
+    <UNIT_ID>Apartman 1</UNIT_ID>
+  </RESERVATION>
+  <RESERVATION deleted="0" timesCanceled="1">
+    <RESID>4</RESID>
+    <UID>ugljesaTourNew</UID>
+    <AID>0</AID>
+    <STATUS>c</STATUS>
+    <AUNIT_ID>0</AUNIT_ID>
+    <UNIT_ID>Soba 0 Changed</UNIT_ID>
+  </RESERVATION>
+  <RESERVATION deleted="0" timesCanceled="0">
+    <RESID>5</RESID>
+    <UID>ugljesaTourNew</UID>
+    <AID>0</AID>
+    <STATUS>a</STATUS>
+    <AUNIT_ID>0</AUNIT_ID>
+    <UNIT_ID>Soba 1</UNIT_ID>
+  </RESERVATION>
+  <RESERVATION deleted="0" timesCanceled="0">
+    <RESID>6</RESID>
+    <UID>ugljesaTourNew</UID>
+    <AID>0</AID>
+    <STATUS>a</STATUS>
+    <AUNIT_ID>1</AUNIT_ID>
+    <UNIT_ID>Sprat 0</UNIT_ID>
+  </RESERVATION>
+  <RESERVATION deleted="0" timesCanceled="0">
+    <RESID>7</RESID>
+    <UID>ugljesaTourNew</UID>
+    <AID>0</AID>
+    <STATUS>a</STATUS>
+    <AUNIT_ID>1</AUNIT_ID>
+    <UNIT_ID>Sprat 1</UNIT_ID>
+  </RESERVATION>
+</RESERVATIONS>

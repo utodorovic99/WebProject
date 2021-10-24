@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ACCOMMODATIONS>
+  <ACCOMMODATION deleted="0">
+    <AC_ID>0</AC_ID>
+    <!--Dodatno da se objezbjedi da se aranzman sa nekom lokacijom-->
+    <!--Moze da ponudi samo smjestaj iz lokacije koju nudi-->
+    <LOCATION>Sutomore</LOCATION>
+    <TYPE>Hotel</TYPE>
+    <NAME>Negro Spa Centar</NAME>
+    <STARS>4</STARS>
+    <POOL>y</POOL>
+    <SPA>y</SPA>
+    <DISABLEDCOMPATIBLE>y</DISABLEDCOMPATIBLE>
+    <WIFI>y</WIFI>
+    <!--Lista smjestajnih jedinica unutar istog smjestaja-->
+    <ACCOMODATIONUNITS>
+      <UNIT deleted="0">
+        <UNIT_ID>Soba 0 Changed</UNIT_ID>
+        <MAX_GUESSTS>2</MAX_GUESSTS>
+        <PETALLOWED>y</PETALLOWED>
+        <PRICE>320</PRICE>
+      </UNIT>
+      <UNIT deleted="0">
+        <UNIT_ID>Soba 1</UNIT_ID>
+        <MAX_GUESSTS>4</MAX_GUESSTS>
+        <PETALLOWED>y</PETALLOWED>
+        <PRICE>410</PRICE>
+      </UNIT>
+      <UNIT deleted="0">
+        <UNIT_ID>Delete</UNIT_ID>
+        <MAX_GUESSTS>4</MAX_GUESSTS>
+        <PETALLOWED>y</PETALLOWED>
+        <PRICE>410</PRICE>
+      </UNIT>
+    </ACCOMODATIONUNITS>
+  </ACCOMMODATION>
+  <ACCOMMODATION deleted="0">
+    <AC_ID>1</AC_ID>
+    <LOCATION>Sutomore</LOCATION>
+    <TYPE>Villa</TYPE>
+    <NAME>Villa Adriatica</NAME>
+    <POOL>y</POOL>
+    <SPA>y</SPA>
+    <DISABLEDCOMPATIBLE>y</DISABLEDCOMPATIBLE>
+    <WIFI>y</WIFI>
+    <ACCOMODATIONUNITS>
+      <UNIT deleted="0">
+        <UNIT_ID>Sprat 0</UNIT_ID>
+        <MAX_GUESSTS>10</MAX_GUESSTS>
+        <PETALLOWED>y</PETALLOWED>
+        <PRICE>1500</PRICE>
+      </UNIT>
+      <UNIT deleted="0">
+        <UNIT_ID>Sprat 1</UNIT_ID>
+        <MAX_GUESSTS>8</MAX_GUESSTS>
+        <PETALLOWED>y</PETALLOWED>
+        <PRICE>1200</PRICE>
+      </UNIT>
+    </ACCOMODATIONUNITS>
+  </ACCOMMODATION>
+  <ACCOMMODATION deleted="0">
+    <AC_ID>2</AC_ID>
+    <LOCATION>Budva</LOCATION>
+    <TYPE>Hotel</TYPE>
+    <NAME>Sheraton</NAME>
+    <STARS>5</STARS>
+    <POOL>y</POOL>
+    <SPA>y</SPA>
+    <DISABLEDCOMPATIBLE>y</DISABLEDCOMPATIBLE>
+    <WIFI>y</WIFI>
+    <ACCOMODATIONUNITS>
+      <UNIT deleted="0">
+        <UNIT_ID>Soba 0</UNIT_ID>
+        <MAX_GUESSTS>2</MAX_GUESSTS>
+        <PETALLOWED>n</PETALLOWED>
+        <PRICE>800</PRICE>
+      </UNIT>
+      <UNIT deleted="0">
+        <UNIT_ID>Soba 1</UNIT_ID>
+        <MAX_GUESSTS>4</MAX_GUESSTS>
+        <PETALLOWED>n</PETALLOWED>
+        <PRICE>1100</PRICE>
+      </UNIT>
+    </ACCOMODATIONUNITS>
+  </ACCOMMODATION>
+  <ACCOMMODATION deleted="0">
+    <AC_ID>3</AC_ID>
+    <LOCATION>Budva</LOCATION>
+    <TYPE>Hotel</TYPE>
+    <NAME>Astra</NAME>
+    <STARS>5</STARS>
+    <POOL>y</POOL>
+    <SPA>y</SPA>
+    <DISABLEDCOMPATIBLE>y</DISABLEDCOMPATIBLE>
+    <WIFI>y</WIFI>
+    <ACCOMODATIONUNITS>
+      <UNIT deleted="0">
+        <UNIT_ID>Apartman 0</UNIT_ID>
+        <MAX_GUESSTS>2</MAX_GUESSTS>
+        <PETALLOWED>n</PETALLOWED>
+        <PRICE>800</PRICE>
+      </UNIT>
+      <UNIT deleted="0">
+        <UNIT_ID>Apartman 1</UNIT_ID>
+        <MAX_GUESSTS>4</MAX_GUESSTS>
+        <PETALLOWED>n</PETALLOWED>
+        <PRICE>1100</PRICE>
+      </UNIT>
+    </ACCOMODATIONUNITS>
+  </ACCOMMODATION>
+  <ACCOMMODATION deleted="0">
+    <AC_ID>4</AC_ID>
+    <LOCATION>Budva</LOCATION>
+    <TYPE>Villa</TYPE>
+    <NAME>SeaShell</NAME>
+    <POOL>y</POOL>
+    <SPA>y</SPA>
+    <DISABLEDCOMPATIBLE>n</DISABLEDCOMPATIBLE>
+    <WIFI>y</WIFI>
+    <ACCOMODATIONUNITS>
+      <UNIT deleted="0">
+        <UNIT_ID>Objekat 0</UNIT_ID>
+        <MAX_GUESSTS>4</MAX_GUESSTS>
+        <PETALLOWED>n</PETALLOWED>
+        <PRICE>380</PRICE>
+      </UNIT>
+      <UNIT deleted="0">
+        <UNIT_ID>Objekat 1</UNIT_ID>
+        <MAX_GUESSTS>4</MAX_GUESSTS>
+        <PETALLOWED>n</PETALLOWED>
+        <PRICE>400</PRICE>
+      </UNIT>
+    </ACCOMODATIONUNITS>
+  </ACCOMMODATION>
+  <ACCOMMODATION deleted="0">
+    <AC_ID>5</AC_ID>
+    <LOCATION>NewLocation</LOCATION>
+    <TYPE>Motel</TYPE>
+    <NAME>NewName</NAME>
+    <POOL>y</POOL>
+    <SPA>y</SPA>
+    <DISABLEDCOMPATIBLE>n</DISABLEDCOMPATIBLE>
+    <WIFI>n</WIFI>
+    <ACCOMODATIONUNITS />
+  </ACCOMMODATION>
+  <ACCOMMODATION deleted="0">
+    <AC_ID>9</AC_ID>
+    <LOCATION>Location</LOCATION>
+    <TYPE>Hotel</TYPE>
+    <NAME>FreeAcc</NAME>
+    <STARS>5</STARS>
+    <POOL>y</POOL>
+    <SPA>y</SPA>
+    <DISABLEDCOMPATIBLE>n</DISABLEDCOMPATIBLE>
+    <WIFI>n</WIFI>
+    <ACCOMODATIONUNITS />
+  </ACCOMMODATION>
+  <ACCOMMODATION deleted="0">
+    <AC_ID>10</AC_ID>
+    <LOCATION>DeletableLoc</LOCATION>
+    <TYPE>Hotel</TYPE>
+    <NAME>DeletableName</NAME>
+    <STARS>5</STARS>
+    <POOL>y</POOL>
+    <SPA>y</SPA>
+    <DISABLEDCOMPATIBLE>n</DISABLEDCOMPATIBLE>
+    <WIFI>n</WIFI>
+    <ACCOMODATIONUNITS />
+  </ACCOMMODATION>
+</ACCOMMODATIONS>

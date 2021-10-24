@@ -1,0 +1,609 @@
+﻿<html>
+
+<head>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+    <script type="text/javascript" src="~/Scripts/LoginRegister.js"></script>
+
+    <link rel="stylesheet" href="~/Content/Site.css" />
+    <link rel="stylesheet" href="~/Content/LoginRegister.css" />
+    <link rel="stylesheet" href="~/Content/NavBar.css" />
+    <link rel="stylesheet" href="~/Content/v6.6.1-dist/ol.css" type="text/css" />
+    <style>
+        .map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+    <script type="text/javascript" src="~/Content/v6.6.1-dist/ol.js"></script>   
+
+</head>
+
+<body style="background-image:url(../../Content/Images/summer.jpg); background-attachment:fixed; ">
+
+    <div class="container-fluid">
+
+        <nav class="navbar navbar-default">
+            <div class="container">
+
+                <div class="navbar-header">
+                    <a style="cursor:pointer;" onko class="navbar-brand" onclick='return TriggerBack()'>Back</a>
+                    <script>
+
+                        $(document).load()
+                        {
+                            $.ajax({
+                                dataType: "json",
+                                type: "GET",
+                                url: "/api/arrangements/readNSC/" + window.localStorage.getItem('AccommodationsToShowFor'),
+                                success: function(data)
+                                {
+                                    PrintArrangement(data);
+                                }
+                            });
+
+                        };
+
+                        function TriggerBack()
+                        {
+                            $(document).ready(function ()
+                            {
+                                if(history.length>2)
+                                    history.back();
+                                else
+                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                            });
+                        }
+
+                        function PrintArrangement(element) {
+                            // TABELA ARANZMANA
+                            let arrangements = new String("<table class=\"table\" id=\"arrangements_table\">");
+                            // RED SA OSNOVNIM INFORMACIJAMA (NASLOVAN LINIJA TABELE)
+                            arrangements +=
+                                "<tr>" +
+                                    "<th>Name</th>" +
+                                    "<th>From</th>" +
+                                    "<th>Till</th>" +
+                                    "<th>Total days</th>" +
+                                    "<th>Price from:</th>" +
+                                    "<th>&nbsp</th>" +
+                                "</tr>";
+
+
+                            
+                                // RED SA OSNOVNIM INFORMACIJAMA (PODACI)
+                                arrangements +=
+                                "<tr id=" + "\"btn_" + element.Name + "\"" + " style=\"cursor:pointer;\">" +
+                                    "<td style=\"border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + element.Name + "</td>" +
+                                    "<td style=\"border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + element.DateStart + "</td>" +
+                                    "<td style=\"border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + element.DateStop + "</td>" +
+                                    "<td style=\"border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + element.Days + "</td>" +
+                                    "<td style=\"border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + element.MinPrice + "</td>" +
+                                    "<td style=\"border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + "<img src=\"" + element.PosterURL + "\" style=\"width:35%; height:35%; border-radius:50%; \"/>" + "</td>" +
+                                "</tr>";
+                            
+                            arrangements += "</table>";
+                            $(document).ready(function () { $('#arrangements_table_container').html(arrangements); });
+                            HandleTableClick(element);
+                        }
+
+                        function HandleUnitReservationOrCancel(elem) {
+                            let postParams = elem.id.split("_");
+                            if (postParams[1] == "reserve") {
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/api/reservations/reserve",
+                                    data: JSON.stringify({
+                                        'arrangement': postParams[2], 'accommodation': postParams[3],
+                                        'unit': postParams[4], "user": window.localStorage.getItem("username")
+                                    }),
+                                    contentType: "application/json",
+                                    dataType: "text",
+                                    headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                    success: function (data, status) {
+                                        let idParts = elem.id.split("_");
+                                        elem.id = idParts[0]+"_" + "reserveCancel"+"_"+ idParts[2]+"_"+idParts[3]+"_"+idParts[4];
+                                        elem.innerText = "Cancel";
+                                        document.getElementById("available_" + idParts[2] + "_" + idParts[3] + "_" + idParts[4]).innerHTML = "<strong>NO<strong>";
+                                        document.getElementById("available_" + idParts[2] + "_" + idParts[3] + "_" + idParts[4]).style = "color:red;";
+                                    },
+                                    error: function (jqXhr, textStatus, errorMessage) {
+                                        // Handle issue
+                                        if (jqXhr.status == 405)
+                                        {
+                                            alert("Please log in");
+                                            window.localStorage.removeItem("username");
+                                            $(document).ready(function () {
+                                                document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                                                return;
+                                            });
+                                        }
+                                        else alert("Reservation failed");         
+                                    }
+                                });
+                            }
+                            else if (postParams[1] == "reserveCancel") {
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/api/reservations/unreserve",
+                                    data: JSON.stringify({
+                                        'arrangement': postParams[2], 'accommodation': postParams[3],
+                                        'unit': postParams[4], "user": window.localStorage.getItem("username")
+                                    }),
+                                    contentType: "application/json",
+                                    dataType: "text",
+                                    headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                    success: function (data, status) {
+                                        let idParts = elem.id.split("_");
+                                        elem.id = idParts[0] + "_" + "reserve" + "_" + idParts[2] + "_" + idParts[3] + "_" + idParts[4];
+                                        elem.innerText = "Reserve";
+                                        document.getElementById("available_" + idParts[2] + "_" + idParts[3] + "_" + idParts[4]).innerHTML = "<strong>YES<strong>";
+                                        document.getElementById("available_" + idParts[2] + "_" + idParts[3] + "_" + idParts[4]).style = "color:green;";
+                                        // ALERT LIKE SUCCESS
+                                    },
+                                    error: function (jqXhr, textStatus, errorMessage) {
+                                        // Handle issue
+                                        alert("Cancelation failed: "+jqXhr.responseText);
+                                    }
+                                });
+                            }
+                        }
+
+                        function RenderExtraTouristOptions(data, elem, olderReservations)
+                        {
+                            let newHtml = "";
+                            for (accommodation in data) {
+                                for (unit in data[accommodation].Units) {
+
+                                    if (window.localStorage.getItem("username") != null) {
+                                        if ((data[accommodation].Units)[unit].Available) {
+                                            newHtml =
+                                            "<td><button id=\"btn_reserve_" + elem.Name + "_"
+                                            + data[accommodation].Name + "_" + (data[accommodation].Units)[unit].UID + "\">Reserve" +
+                                            "</button></td></tr>";
+                                            document.getElementById("row_" + elem.Name + "_" + data[accommodation].Name + "_" + (data[accommodation].Units)[unit].UID).innerHTML += newHtml;
+                                        }
+                                        else {
+                                            //For each arrangement
+                                            for (key in olderReservations.Reservations) {
+                                                // Pinpoint 
+                                                if (data[accommodation].Name == key) {   //For each its unit
+                                                    for (unitIN in olderReservations.Reservations[key]) {   // Is NonAvailable-one reserved by user?
+                                                        if ((data[accommodation].Units)[unit].UID == olderReservations.Reservations[key][unitIN]) {
+                                                            newHtml =
+                                                                "<td><button id=\"btn_reserveCancel_" + elem.Name + "_"
+                                                                + data[accommodation].Name + "_" + (data[accommodation].Units)[unit].UID + "\">Cancel&nbsp&nbsp" +
+                                                                "</button></td></tr>";
+
+                                                            document.getElementById("row_" + elem.Name + "_" + data[accommodation].Name + "_" + (data[accommodation].Units)[unit].UID).innerHTML += newHtml;
+                                                        }
+                                                    }
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            // For each accommodation
+                            for (accommodation in data) {
+                                // And for each its unit
+                                for (unit in data[accommodation].Units) {
+                                    // Register free ones
+                                    let element = document.getElementById("btn_reserve_" + elem.Name + "_" + data[accommodation].Name + "_" + (data[accommodation].Units)[unit].UID);
+                                    if (element != null) { element.addEventListener('click', function () { HandleUnitReservationOrCancel(element); }); continue; }
+
+                                    // Register previously reserved
+                                    for (let key in olderReservations.Reservations) {
+                                        for (unit in olderReservations.Reservations[key]) {
+                                            if (data[accommodation].Name == key && (data[accommodation].Units)[unit].UID == olderReservations.Reservations[key][unit]) {
+
+                                                element = document.getElementById("btn_reserveCancel_" + elem.Name + "_" + data[accommodation].Name + "_" + (data[accommodation].Units)[unit].UID);
+                                                if (element != null) element.addEventListener('click', function () { HandleUnitReservationOrCancel(element); })
+                                            }
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                        function HandleAddNewAccommodation(elem)
+                        {
+                            window.localStorage.setItem('targetData', elem.id);
+                            window.localStorage.setItem('operation', 'c');
+                            document.location.href = window.location.protocol + "//" + window.location.host + "/Manager/Accommodation";
+                            
+                        }
+
+                        function HandleModifyAccommodation(elem) {
+                            window.localStorage.setItem('targetData', elem.id);
+                            window.localStorage.setItem('operation', 'm');
+                            document.location.href = window.location.protocol + "//" + window.location.host + "/Manager/Accommodation";
+                        }
+
+                        function HandleDeleteAccommodation(elem)
+                        {
+                            let parts = elem.id.split("_");
+                            $.ajax({
+                                type: "PUT",
+                                url: "/api//accommodation/delete/" + parts[2] + "/" + parts[3],
+                                headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                success: function (data, status) {
+                                    alert("Successfully deleted");
+                                    RenderManagerOffer(data, elem);
+                                },
+                                error: function (jqXhr, textStatus, errorMessage) {
+                                    alert("Deleting failed with error: " + jqXhr.responseText);
+                                }
+                            });
+                        }
+
+                        function HandleDeleteAccommodationUnit(elem)
+                        {
+                            
+                            let parts = elem.id.split("_");
+                            $.ajax({
+                                type: "PUT",
+                                url: "/api/accommodation/deleteACUnit/" + parts[3] + "/" + parts[4],
+                                headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                success: function (data, status) {
+                                    alert("Successfully deleted");
+                                    document.getElementById("row_" + parts[2] + "_" + parts[3] + "_" + parts[4]).style.backgroundColor= "#CD5C5C";
+                                    document.getElementById("btn_deleteUnit_" + parts[2] + "_" + parts[3] + "_" + parts[4]).remove(); 
+                                    document.getElementById("btn_modifyUnit_" + parts[2] + "_" + parts[3] + "_" + parts[4]).remove();
+                                },
+                                error: function (jqXhr, textStatus, errorMessage) {
+                                    alert("Deleting failed with error: " + jqXhr.responseText);
+                                }
+                            });
+                        }
+
+                        function HandleModifyAccommodationUnit(elem)
+                        {
+                            window.localStorage.setItem('operation','up');
+                            window.localStorage.setItem('targetData', elem.id);
+                            document.location.href = window.location.protocol + "//" + window.location.host + "/Manager/Unit";
+                        }
+
+                        
+
+                        function RenderBasicOffer(data, elem)
+                        {
+
+                            newHtml = "<table class=\"table\">" +
+                                        "<tr style=\"background-color: #fff4a5;\">" +
+                                            "<th>Name</th>" +
+                                            "<th>Type</th>" +
+                                            "<th>Location</th>" +
+                                            "<th>Stars</th>" +
+                                            "<th>Pool</th>" +
+                                            "<th>Spa</th>" +
+                                            "<th>Dissabled<br>Compatible</th>" +
+                                            "<th>WiFi</th>" +
+                                        "</tr>";
+                            
+                            for (accommodation in data) {
+                                newHtml +=
+                                "<tr style=\"background-color: #DAF7A6;\">" +
+                                    "<td><u>" + data[accommodation].Name + "</u></td>" +
+                                    "<td>" + data[accommodation].Type + "</td>" +
+                                    "<td>" + data[accommodation].Location + "</td>" +
+                                    "<td>" + (data[accommodation].Type != "Hotel" ? "/" : data[accommodation].Stars) + "</td>" +
+                                    "<td>" + (data[accommodation].Pool == true ? "YES" : "NO") + "</td>" +
+                                    "<td>" + (data[accommodation].Spa == true ? "YES" : "NO") + "</td>" +
+                                    "<td>" + (data[accommodation].DisabledCompatible == true ? "YES" : "NO") + "</td>" +
+                                    "<td>" + (data[accommodation].WiFi == true ? "YES" : "NO") + "</td>" +
+                                "</tr>";
+
+                                newHtml += "<tr><th colspan=\"8\" style=\"text-align:center;\">Units</th>"+"</tr>";
+                                newHtml +=
+                                    "<tr>" +
+                                        "<th colspan=\"3\">Unit Name</th>" +
+                                        "<th colspan=\"2\">Capacity</th>" +
+                                        "<th>Pets<br>Allowed</th>" +
+                                        "<th>Price</th>" +
+                                        "<th>Available</th>" +
+                                    "</tr>";
+
+                                for (unit in data[accommodation].Units) {
+
+                                    newHtml +=
+                                    "<tr id=\"row_" + elem.Name + "_" + data[accommodation].Name + "_" + (data[accommodation].Units)[unit].UID + "\">" +
+                                        "<td colspan=\"3\"><b>" + (data[accommodation].Units)[unit].UID + "</b></td>" +
+                                        "<td colspan=\"2\">" + (data[accommodation].Units)[unit].MaxGuessts + "</td>" +
+                                        "<td>" + ((data[accommodation].Units)[unit].PetAllowed == true ? "YES" : "NO") + "</td>" +
+                                        "<td> " + (data[accommodation].Units)[unit].Price + "</td>" +
+                                        "<td id=\"available_" + elem.Name + "_" + data[accommodation].Name + "_" + (data[accommodation].Units)[unit].UID + "\" " +
+                                        ((data[accommodation].Units)[unit].Available == true ? "style=\"color:green;\"> <strong>YES</strong>" : "style=\"color:red;\"> <strong>NO</strong>") + "</td>" +
+                                    "</tr>"
+                                }
+                            }
+                            newHtml += "</table>";
+                            document.getElementById("accommodations_table_container").outerHTML += newHtml;
+                        }
+
+                        function HandleArrangementDelete(elem) {
+
+                            $.ajax({
+                                type: "PUT",
+                                url: "/api/arrangements/delete/" + elem.id.split('_')[2],
+                                headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                success: function (data, status) {
+
+                                    document.getElementById("btn_" + elem.id.split('_')[2]).remove();
+                                    alert('Success');
+
+                                },
+                                error: function (jqXhr, textStatus, errorMessage) {
+                                    alert("Deleting arrangement failed with error: " + jqXhr.responseText);
+                                }
+                            });
+                        }
+
+                        function HandleArrangementModify(elem) {
+                            window.localStorage.setItem('UpdateTarget', elem.id.split('_')[2])
+                            document.location.href = window.location.protocol + "//" + window.location.host + "/Manager/Arrangements";
+                        }                    
+
+                        function RenderManagerOffer(data, elem)
+                        {
+
+                            newHtml = "<table class=\"table\">" +
+                                        "<tr style=\"background-color: #fff4a5;\">" +
+                                            "<th>Name</th>" +
+                                            "<th>Type</th>" +
+                                            "<th>Location</th>" +
+                                            "<th>Stars</th>" +
+                                            "<th>Pool</th>" +
+                                            "<th>Spa</th>" +
+                                            "<th>Dissabled<br>Compatible</th>" +
+                                            "<th>WiFi</th>" +
+                                            "<th style=\"background-color:white;\">&nbsp</th>" +
+                                        "</tr>" +
+                                        "<tr style=\"background-color: #fff4a5;\">" +
+                                            "<td colspan=\"3\"><b>Arrangement options:</b></td>" +
+                                            "<td colspan=\"5\">" +
+                                                "<button onclick=\"HandleAddNewAccommodation(this)\" id=\"btn_addNewAccommodation_" + elem.Name + "_" + data[accommodation].Name + "\" style=\"color:green;\">New Acc.</button>&nbsp" +
+                                                "<button onclick=\"HandleArrangementDelete(this)\" id=\"btn_deleteArrangement_" + elem.Name + "\" style=\"color:#CD5C5C;\">Delete </button>&nbsp" +
+                                                "<button onclick=\"HandleArrangementModify(this)\" id=\"btn_modifyArrangement_" + elem.Name + "\" style=\"color:#4169e1;\">Modify</button>" +
+                                            "</td>" +
+                                            "<td style=\"background-color:white;\">&nbsp</td>" +
+                                        "</tr>";
+
+                            for (accommodation in data) {
+                                newHtml +=
+                                "<tr style=\"background-color: #DAF7A6;\">" +
+                                    "<td><u>" + data[accommodation].Name + "</u></td>" +
+                                    "<td>" + data[accommodation].Type + "</td>" +
+                                    "<td>" + data[accommodation].Location + "</td>" +
+                                    "<td>" + (data[accommodation].Type != "Hotel" ? "/" : data[accommodation].Stars) + "</td>" +
+                                    "<td>" + (data[accommodation].Pool == true ? "YES" : "NO") + "</td>" +
+                                    "<td>" + (data[accommodation].Spa == true ? "YES" : "NO") + "</td>" +
+                                    "<td>" + (data[accommodation].DisabledCompatible == true ? "YES" : "NO") + "</td>" +
+                                    "<td>" + (data[accommodation].WiFi == true ? "YES" : "NO") + "</td>" +
+                                    "<td style=\"background-color:white;\">&nbsp</td>" +
+                                "</tr>"+
+                                "<tr>" +
+                                    "<td colspan=\"3\" style=\"background-color: #DAF7A6;\"><b>Accommodation options:</b></td>" +
+                                    "<td colspan=\"5\" style=\"background-color: #DAF7A6;\">" +                                 //Koji arrangement  i koji accommodation
+                                        "<button onclick=\"HandleAddNewAccommodationUnit(this)\" id=\"btn_addNewAccommodationUnit_" + elem.Name + "_" + data[accommodation].Name + "\" style=\"color:green;\">New Unit</button>&nbsp" +
+                                        "<button onclick=\"HandleDeleteAccommodation(this)\" id=\"btn_deleteAccommodation_"         + elem.Name + "_" + data[accommodation].Name + "\" style=\"color:#CD5C5C;\">Delete </button>&nbsp" +
+                                        "<button onclick=\"HandleModifyAccommodation(this)\" id=\"btn_modifyAccommodation_"         + elem.Name + "_" + data[accommodation].Name + "\" style=\"color:#4169e1;\">Modify</button>" +
+                                    "</td>" +
+                                    "<td style=\"background-color:white;\">&nbsp</td>"
+                                "</tr>";
+
+                                newHtml += "<tr><th colspan=\"8\" style=\"text-align:center;\">Units</th>"+
+                                                "<td style=\"background-color:white;\">&nbsp</td>"+
+                                           "</tr>";
+                                newHtml +=
+                                    "<tr>" +
+                                        "<th colspan=\"3\">Unit Name</th>" +
+                                        "<th colspan=\"2\">Capacity</th>" +
+                                        "<th>Pets<br>Allowed</th>" +
+                                        "<th>Price</th>" +
+                                        "<th>Available</th>" +
+                                        "<th style=\"background-color:white;\">&nbsp</th>" +
+                                    "</tr>";
+
+                                for (unit in data[accommodation].Units) {
+
+                                    newHtml +=
+                                    "<tr id=\"row_" + elem.Name + "_" + data[accommodation].Name + "_" + (data[accommodation].Units)[unit].UID + "\">" +
+                                        "<td colspan=\"3\"><b>" + (data[accommodation].Units)[unit].UID + "</b></td>" +
+                                        "<td colspan=\"2\">" + (data[accommodation].Units)[unit].MaxGuessts + "</td>" +
+                                        "<td>" + ((data[accommodation].Units)[unit].PetAllowed == true ? "YES" : "NO") + "</td>" +
+                                        "<td> " + (data[accommodation].Units)[unit].Price + "</td>" +
+                                        "<td id=\"available_" + elem.Name + "_" + data[accommodation].Name + "_" + (data[accommodation].Units)[unit].UID + "\" " +
+                                        ((data[accommodation].Units)[unit].Available == true ? "style=\"color:green;\"> <strong>YES</strong>" : "style=\"color:red;\"> <strong>NO</strong>") + "</td>" +
+                                        "<td style=\"background-color:white;\">" +                                          //Koji arrangement  i koji accommodation             i koji unin unutar njega
+                                            "<button onclick=\"HandleDeleteAccommodationUnit(this)\" id=\"btn_deleteUnit_" + elem.Name + "_" + data[accommodation].Name + "_" + (data[accommodation].Units)[unit].UID + "\" style=\"color:#CD5C5C;\">X</button>&nbsp" +
+                                            "<button onclick=\"HandleModifyAccommodationUnit(this)\" id=\"btn_modifyUnit_" + elem.Name + "_" + data[accommodation].Name + "_" + (data[accommodation].Units)[unit].UID + "\" style=\"color:#4169e1;\">M</button>" +
+                                        "</td>"+
+                                     "</tr>";
+                                }
+                            }
+                            newHtml += "</table>";
+                            document.getElementById("accommodations_table_container").outerHTML += newHtml;
+                        }
+
+                        function HandleTableClick(elem) {
+
+                            $(document).ready(function () {
+                                $.getJSON
+                                ("/api/arrangements/" + elem.Name,
+                                    function (data, status) {
+                                        let newHtml = new String();
+                                        newHtml +=
+                                            "<tr><td colspan=\"6\" id=\"th_details_" + elem.Name + "\">" +
+                                                "<div id=\"details_" + elem.Name + "\">" +
+                                                    "<h3>" + elem.Name + "</h3>" +
+                                                    "<img src=\"" + data.PosterURL + "\"/>" + "<br/>" +
+                                                    "<p> Location: " + data.Locationn + "</p>" +
+                                                    "<p> Type: " + data.Type + "</p>" +
+                                                    "<p> Starts: " + data.DateStart + "</p>" +
+                                                    "<p> Ends: " + data.DateStop + "</p>" +
+                                                    "<p> Max. Passengers:" + data.MaxPassengers + "</p>" +
+                                                    "<h4>Program:</h4>" +
+                                                    "<p> " + data.Program + "</p>" +
+                                                    "<h4>Description:</h4>" +
+                                                    "<p>" + data.Desc + "</p>" +
+                                                    "<p> Transport: " + data.Transport + "</p>" +
+                                                    "<p> Meeting time:" + data.MeetingTime + "</p>" +
+                                                    "<p> Meeting spot: " + data.MeetingSpot.Address + "</p>" +
+                                                    "<div id=\"map_" + elem.Name + "\" class=\"map\"></div>" +  
+                                                "</div>" +
+                                          "</td></tr>";
+
+                                        document.getElementById("btn_" + elem.Name).outerHTML += newHtml;
+
+                                        var map = new ol.Map(
+                                            {
+                                                target: 'map_' + elem.Name,
+                                                layers: [new ol.layer.Tile({ source: new ol.source.OSM() })],
+                                                view: new ol.View(
+                                                    {
+                                                        center: ol.proj.fromLonLat([data.MeetingSpot.GeoLongitude, data.MeetingSpot.GeoLatitude]),
+                                                        zoom: 13
+                                                    })
+                                            });
+
+                                        var layer = new ol.layer.Vector({
+                                            source: new ol.source.Vector({
+                                                features: [
+                                                    new ol.Feature({
+                                                        geometry: new ol.geom.Point(ol.proj.fromLonLat([data.MeetingSpot.GeoLongitude, data.MeetingSpot.GeoLatitude]))
+                                                    })
+                                                ]
+                                            })
+                                        });
+                                        map.addLayer(layer);
+
+                                        let uriParams = "";
+                                        for (accommodation in data.Accommodations) {
+                                            uriParams += "," + data.Accommodations[accommodation];
+                                        }
+                                        uriParams = uriParams.substring(1);
+
+                                        if (window.localStorage.getItem('Role') == 'Tourist')
+                                        {
+
+                                            // Get previosly reserved
+                                            $.ajax({
+                                                type: "GET",
+                                                url: "/api/reservations/activeReservationsFor/" + elem.Name + "/" + window.localStorage.getItem("username"),
+                                                contentType: "application/json",
+                                                dataType: "text",
+                                                headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                                success: function (data, status) {
+                                                    let olderReservations =$.extend( true, {}, JSON.parse(data));     
+                                                    if (uriParams != "") {
+
+                                                        $.ajax({
+                                                            type: "GET",
+                                                            url: "/api/accommodations/" + uriParams + "/" + elem.Name,
+                                                            success: function (data, status) {
+                                                                RenderBasicOffer(data, elem);
+                                                                RenderExtraTouristOptions(data, elem, olderReservations);
+                                                            },
+                                                            error: function (jqXhr, textStatus, errorMessage) {
+                                                                alert('An error occured loading acommodations: ' + jqXhr.responseText);
+                                                            }
+                                                        });
+                                                    }
+                                                    else {
+                                                        document.getElementById("accommodations_table_container").outerHTML += "<h4 class=\"impTxt\">No accommodations to offer</h4>";
+                                                    }
+
+                                                },
+                                                error: function (jqXhr, textStatus, errorMessage) {
+                                                    if (jqXhr.status == 401) {
+                                                        window.localStorage.removeItem("username");
+                                                        window.localStorage.removeItem('TALoginToken');
+                                                        window.localStorage.removeItem('Role');
+
+                                                        if (confirm("Please log in")) {
+                                                            document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                                                        };
+                                                    }
+
+                                                }
+                                            });     
+                                        }
+                                        else if(window.localStorage.getItem('Role')=='Manager')
+                                        {
+
+                                            // Get previosly reserved
+                                            $.ajax({
+                                                type: "GET",
+                                                url: "/api/reservations/activeReservationsFor/" + elem.Name + "/" + window.localStorage.getItem("username"),
+                                                contentType: "application/json",
+                                                dataType: "text",
+                                                headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                                success: function (data, status) {
+                                                    let olderReservations = $.extend(true, {}, data);
+                                                    if (uriParams != "") {
+
+                                                        $.ajax({
+                                                            type: "GET",
+                                                            url: "/api/accommodations/" + uriParams + "/" + elem.Name,
+                                                            success: function (data, status) {
+                                                                RenderManagerOffer(data, elem);
+                                                            },
+                                                            error: function (jqXhr, textStatus, errorMessage) {
+                                                                alert('An error occured loading acommodations: ' + jqXhr.responseText);
+                                                            }
+                                                        });
+                                                    }
+                                                    else {
+                                                        document.getElementById("accommodations_table_container").outerHTML += "<h4 class=\"impTxt\">No accommodations to offer</h4>";
+                                                    }
+
+                                                },
+                                                error: function (jqXhr, textStatus, errorMessage) {
+                                                    if (jqXhr.status == 401) {
+                                                        window.localStorage.removeItem("username");
+                                                        window.localStorage.removeItem('TALoginToken');
+                                                        window.localStorage.removeItem('Role');
+
+                                                        if (confirm("Please log in")) {
+                                                            document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                                                        };
+                                                    }
+
+                                                }
+                                            });
+                                        }
+
+                                    }
+                                 );
+                            });
+                        }
+                    
+                    </script>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div id="arrangements_table_container"></div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div id="accommodations_table_container"></div>
+                </div>
+             </div>
+        </div>
+        </div>
+
+</body>
+
+</html>
+
+

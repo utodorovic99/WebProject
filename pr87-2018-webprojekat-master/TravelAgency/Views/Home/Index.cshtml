@@ -1,0 +1,1170 @@
+﻿<html>
+    <head>
+        <script  type="text/javascript" src="~/Scripts/jquery-1.10.2.js"></script>
+        <script  type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+        <script  type="text/javascript" src="~/Scripts/LoginRegister.js"></script>
+
+        <link rel="stylesheet" href="~/Content/Site.css"/>
+        <link rel="stylesheet" href="~/Content/LoginRegister.css" />               
+        <link rel="stylesheet" href="~/Content/NavBar.css" />    
+        <link rel="stylesheet" href="~/Content/v6.6.1-dist/ol.css" type="text/css"/> 
+        <style>
+            .map
+            {
+                height:400px;
+                width:100%;
+            }
+        </style>  
+        <script  type="text/javascript" src="~/Content/v6.6.1-dist/ol.js"></script>   
+
+    </head>
+
+    <body style="background-image:url(../../Content/Images/summer.jpg); background-attachment:fixed; ">
+
+        
+        <div class="container-fluid">
+            <nav class="navbar navbar-default">
+                <div class="container">
+
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="~/Home/Index">Home</a>
+                    </div>
+
+                    <div>
+                        <ul id="navbarList" class="nav navbar-nav navbar-right">
+                            <li><a href="~/Home/HistoryAndOngoing">History and Ongoing</a></li>
+                        </ul>
+                       
+                    </div>
+                </div>
+            </nav>
+            </div>
+
+            <div class="container">
+                <div class="row">
+                    <div id="login_reg_row" class="col-md-3 col-md-offset-0">
+                        <div class="panel panel-login">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <a href="#" class="active" id="login-form-link">Login</a>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <a href="#" id="register-form-link">Register</a>
+                                    </div>
+                                </div>
+                                <hr>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <form id="login-form" method="post" role="form" style="display: block;">
+                                            <div class="form-group">
+                                                <input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Username" value="">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-sm-6 col-sm-offset-3">
+                                                        <input type="button" name="login-submit" id="login-submit" tabindex="4" class="form-control btn btn-login" value="Log In">
+                                                    <script>
+
+
+                                                        function HandleLoginClick() 
+                                                        {
+                                                            let username= new String(); username=$("#username").val();
+                                                            let password= new String(); password=$("#password").val();
+                                                            let passwordErr= new String("");
+                                                            let usernameErr = new String("");
+
+                                                            if(username==null || username==="")
+                                                                usernameErr="Empty field"
+
+                                                            else
+                                                            {
+                                                                if (username.length < 8)  usernameErr = "username must contain at least 8 charachters";
+                                                                if (username.length > 20) usernameErr = "username can contain max. 20 charachters";
+                                                                if (username.includes(' ')) usernameErr += "no spaces allowed";
+                                                            }
+
+                                                            if(password==="" || password==null)
+                                                                passwordErr="Empty field"
+                                                            else
+                                                            {if (password.length < 8) passwordErr = "password must contain at least 8 charachters";}
+
+                                                            if(usernameErr=="" && passwordErr=="")
+                                                            {
+                                                                window.localStorage.setItem('TALoginToken', 'Basic '+btoa(username+':'+SHA256(password)));
+                                                                window.localStorage.setItem('username', username);
+
+                                                                $.ajax({
+                                                                    type: "POST",
+                                                                    url: "/api/login",
+                                                                    data: JSON.stringify({'username': username, 'password':SHA256(password)}),
+                                                                    contentType: "application/json",
+                                                                    dataType: "text",
+                                                                    headers :{'Authorization' : window.localStorage.getItem('TALoginToken')},
+                                                                    success: function(data, status)     
+                                                                    { 
+                                                                              
+                                                                        if(document.getElementById("btn_logout")==null)
+                                                                            document.getElementById("navbarList").innerHTML+="<li><button id=\"btn_logout\" class=\"form-control btn btn-login\" style=\"padding-left:3%;\">Logout</button></li>";   
+
+                                                                        window.localStorage.setItem('Role', data.substring(1, data.length-1));
+
+                                                                        if(window.localStorage.getItem('Role')!=null)
+                                                                        {
+                                                                            $(document).on('click','#btn_logout',function(){HandleLogoutClick()});
+                                                                        }
+
+                                                                        if(data.substring(1, data.length-1) == "Administrator") RenderAdminEnvironment();
+                                                                        else if(data.substring(1, data.length-1) == "Manager") RenderManagerEnvironment();
+                                                                        else if(data.substring(1, data.length-1) == "Tourist") RenderTouristEnvironment();
+                                                                    },
+                                                                    error: function(jqXhr, textStatus, errorMessage)
+                                                                    {
+                                                                        alert("Login failed with error: "+jqXhr.responseText);
+                                                                    }
+                                                                        
+                                                                });   
+                                                            }      
+                                                        } 
+
+                                                        function HandleLogoutClick()
+                                                        {
+                                                            window.localStorage.removeItem("username");
+                                                            window.localStorage.removeItem("Role");
+                                                            document.location.href=window.location.protocol + "//" + window.location.host+"/Home";
+
+                                                            if(document.getElementById("navbarList")!=null)
+                                                                document.getElementById("navbarList").remove();//!
+                                                        }
+
+                                                        function RenderLoggedEnvironment()
+                                                        {
+                                                            document.getElementById("login_reg_row").remove();
+                                                            if(document.getElementById("btn_logout")==null)
+                                                                document.getElementById("navbarList").innerHTML+="<li><button id=\"btn_logout\" class=\"form-control btn btn-login\" style=\"padding-left:3%;\">Logout</button></li>"; 
+
+                                                            if(window.localStorage.getItem('Role')!=null)
+                                                            {
+                                                                $(document).on('click','#btn_logout',function(){HandleLogoutClick()});
+                                                            }
+                                                         
+                                                            if(window.localStorage.getItem('Role')!='Administrator' && document.getElementById("profileLink")==null)
+                                                            {
+                                                                document.getElementById("navbarList").innerHTML="<li id=\"profileLink\"><a href=\"../Home/Profile\">Profile</a></li>"+document.getElementById("navbarList").innerHTML;                                                                                                                            }  
+                                                            
+                                                        }
+
+                                                        function RenderTouristEnvironment()
+                                                        {
+                                                            // window.localStorage.setItem('Role', 'Tourist');
+                                                            window.localStorage.setItem('Role', 'Tourist');
+                                                            RenderLoggedEnvironment();
+                                                            if(document.getElementById("reservationsLink")==null)
+                                                                document.getElementById("navbarList").innerHTML="<li id=\"reservationsLink\"><a href=\"../Tourist/Reservations\">Reservations</a></li>"+document.getElementById("navbarList").innerHTML;
+                                                        }
+
+                                                        function RenderManagerEnvironment()
+                                                        {
+                                                            window.localStorage.setItem('Role', 'Manager');
+                                                            RenderLoggedEnvironment();
+                                                            if(document.getElementById("arrangementsLink")==null)
+                                                                document.getElementById("navbarList").innerHTML="<li id=\"arrangementsLink\"><a href=\"javascript:HandleCreateArrangement()\">Create Arrangement</a></li>"+document.getElementById("navbarList").innerHTML; 
+                                                            
+                                                            if(document.getElementById("accommodationsLink")==null)
+                                                                document.getElementById("navbarList").innerHTML="<li id=\"accommodationsLink\"><a href=\"javascript:HandleCreateAccommodation()\">Accommodation Wizard</a></li>"+document.getElementById("navbarList").innerHTML;
+
+                                                            if(document.getElementById("accUnitsLink")==null)
+                                                                document.getElementById("navbarList").innerHTML="<li id=\"accUnitsLink\"><a href=\"javascript:HandleCreateAccommodationUnit()\">Acc. Unit Wizard</a></li>"+document.getElementById("navbarList").innerHTML;
+
+                                                            if(document.getElementById("reservationsLink")==null)
+                                                                document.getElementById("navbarList").innerHTML="<li id=\"reservationsLink\"><a href=\"javascript:HandleOpenReservations()\">Reservations</a></li>"+document.getElementById("navbarList").innerHTML;
+
+                                                                RenderManagerExtraButtons();
+                                                        }
+
+                                                        function RenderAdminEnvironment()
+                                                        {      
+                                                            window.localStorage.setItem('Role', 'Administrator');
+
+                                                            if(document.getElementById("blackListLink")==null)
+                                                                document.getElementById("navbarList").innerHTML="<li id=\"blackListLink\"><a href=\"javascript:HandleOpenBlackList()\">Ban List</a></li>"+document.getElementById("navbarList").innerHTML;
+
+                                                            RenderLoggedEnvironment();
+                                                        }
+
+                                                        function HandleCreateArrangement()
+                                                        {
+                                                            window.localStorage.removeItem('UpdateTarget'); // Mora da bi otvorilo Create a ne Update rezim
+                                                            document.location.href=window.location.protocol + "//" + window.location.host+"/Manager/Arrangements";
+                                                        }
+
+                                                        function HandleCreateAccommodation()
+                                                        {
+                                                            window.localStorage.setItem('operation', 'tn')
+                                                            document.location.href=window.location.protocol + "//" + window.location.host+"/Manager/Accommodation";
+                                                        }
+
+                                                        function HandleCreateAccommodationUnit()
+                                                        {
+                                                            window.localStorage.setItem('operation', 'tn')
+                                                            document.location.href=window.location.protocol + "//" + window.location.host+"/Manager/Unit";
+                                                        }
+
+                                                        function HandleOpenReservations()
+                                                        {
+                                                            document.location.href=window.location.protocol + "//" + window.location.host+"/Manager/Reservations";
+                                                        }
+
+                                                        function HandleOpenBlackList()
+                                                        {
+                                                            document.location.href=window.location.protocol + "//" + window.location.host+"/Administrator/BanList";
+                                                        }
+
+                                                    </script>
+                                                    
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <form id="register-form"  method="post" role="form" style="display: none;">
+                                            <div class="form-group">
+                                                <input type="text" name="username" id="usernameReg" tabindex="1" class="form-control" placeholder="Username" value="">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="email" name="email" id="emailReg" tabindex="1" class="form-control" placeholder="Email Address" value="">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="password" name="password" id="passwordReg" tabindex="2" class="form-control" placeholder="Password">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <input type="text" name="name" id="nameReg" tabindex="1" class="form-control" placeholder="Name" value="">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <input type="text" name="surname" id="surnameReg" tabindex="1" class="form-control" placeholder="Surname" value="">
+                                            </div>
+
+                                            <div style="transform:scale(0.8)">
+                                                <input type="radio" name="gender" id="genderRegM" tabindex="1" class="form-control" value="m">
+                                                <label for="genderRegM">Male</label>
+                                                <input type="radio" name="gender" id="genderRegF" tabindex="1" class="form-control" value="f">
+                                                <label for="genderRegF">Female</label>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <input type="date" name="birthdate" id="birthdateReg" tabindex="1" class="form-control" placeholder="dd-mm-yyyy" value="">
+
+                                                <script type="text/javascript">
+                                                $(document).ready(function() {
+
+                                                    let  maxValueYear = '@DateTime.Now.AddYears(-18).Year.ToString()';
+                                                    let  maxValueMonth= @DateTime.Now.AddYears(-18).Month.ToString();
+                                                    let  maxValueDay= @DateTime.Now.AddYears(-18).Day.ToString();
+
+                                                    if(maxValueMonth<10) {maxValueMonth="0"+maxValueMonth}
+                                                    if(maxValueDay<10)   {maxValueDay="0"+maxValueDay}
+
+                                                    $("#birthdateReg").attr("max", maxValueYear + "-" + maxValueMonth + "-" + maxValueDay);
+
+                                                    let minValueYear = '@DateTime.Now.AddYears(-130).Year.ToString()';
+                                                    let minValueMonth= @DateTime.Now.AddYears(-130).Month.ToString();
+                                                    let minValueDay= @DateTime.Now.AddYears(-130).Day.ToString();
+
+                                                    if(minValueMonth<10) {minValueMonth="0"+minValueMonth}
+                                                    if(minValueDay<10)   {minValueDay="0"+minValueDay}
+
+                                                    $("#birthdateReg").attr("min", minValueYear + "-" + minValueMonth + "-" + minValueDay);
+             
+                                                });
+                                                </script>
+
+                                            </div>
+
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-sm-6 col-sm-offset-3">
+                                                        <input type="button" name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Register Now">       
+                                                        <script>
+
+                                                            function User(username, password, name, surname, gender, email, birthdate) {
+                                                                this.username = username;
+                                                                this.password = SHA256(password);
+                                                                this.name = name;
+                                                                this.surname = surname;
+                                                                this.email = email;
+                                                                this.role="t"
+                                                                this.gender=gender;
+                                                                
+                                                                this.ReformatDateTime = function (birthdate) {
+                                                                    let parts = birthdate.split('-');
+                                                                    return parts[2] + "/" + parts[1]+"/" + parts[0];
+                                                                };
+                                                                this.birthdate = this.ReformatDateTime(birthdate);
+
+                                                                this.Format = function () {
+                                                                    return "USERNAME: " + this.username + "\n" + "PASSWORD: " + this.password + "\n" + "NAME: " + this.name + "\n" +
+                                                                        "SURNAME: " + this.surname + "\n" + "EMAIL: " + this.email + "\n" + "BIRTHDATE: " + this.birthdate + "\n";
+                                                                };
+                                                            }
+
+                                                            function RegisterReqReport(usernameErr, emailErr, passwordErr, nameErr, surnameErr, birthDateErr, genderErr) {
+                                                                this.usernameErr = usernameErr;
+                                                                this.emailErr = emailErr;
+                                                                this.passwordErr = passwordErr;
+                                                                this.nameErr = nameErr;
+                                                                this.surnameErr = surnameErr;
+                                                                this.birthDateErr = birthDateErr; 
+                                                                this.genderErr = genderErr;
+
+                                                                this.isValid = function () {
+                                                                    return  (this.usernameErr === null && 
+                                                                            this.emailErr=== null &&
+                                                                            this.passwordErr === null &&                                                            
+                                                                            this.nameErr === null || this.surnameErr === null &&
+                                                                            this.birthDateErr === null &&
+                                                                            this.genderErr === null);
+                                                                };
+
+                                                                this.Format = function () {
+                                                                    let outStr="";
+                                                                    outStr+=this.usernameErr == null ? "" : 'Username: '+this.usernameErr+'\n';
+                                                                    outStr+=this.emailErr == null ? "" : 'EMail: '+this.emailErr+'\n';
+                                                                    outStr+=this.passwordErr == null ? "" : 'Password: '+this.passwordErr+'\n';
+                                                                    outStr+=this.nameErr == null ? "" : 'Name: '+this.nameErr+'\n';
+                                                                    outStr+=this.surnameErr == null ? "" : 'Surname: '+this.surnameErr+'\n';
+                                                                    outStr+=this.birthDateErr == null ? "" : 'Birth Date: '+this.birthDateErr+'\n';
+                                                                    outStr+=this.genderErr == null ? "": 'Gender: '+this.genderErr+'\n';
+                                                                    return outStr;
+                                                                };
+                                                            }
+
+                                                            function TestRegisterData(username, email, password, name, surname, birthdate, gender) {
+                                                                var report = new RegisterReqReport(null, null, null, null, null, null, null);
+                                                                let tmpVar = new String;
+                                                                tmpVar=username;
+                                                                if(tmpVar==null || tmpVar==="")
+                                                                    report.usernameErr="Empty field"
+
+                                                                else
+                                                                {
+                                                                    username = tmpVar.trim();
+                                                                    if (username.length < 8)  report.usernameErr = "username must contain at least 8 charachters";
+                                                                    if (username.length > 20) report.usernameErr = "username can contain max. 20 charachters";
+                                                                    if (username.includes(' ')) {
+                                                                        if (report.usernameErr != null) report.usernameErr += ", ";
+                                                                        report.usernameErr += "no spaces allowed";
+                                                                    }
+                                                                }
+
+                                                                tmpVar=password;
+                                                                if(tmpVar==="" || tmpVar==null)
+                                                                    report.passwordErr="Empty field"
+                                                                else
+                                                                {
+                                                                
+                                                                    password = tmpVar;
+                                                                    if (password.length < 8) report.passwordErr = "password must contain at least 8 charachters";
+                                                                }
+  
+
+                                                                tmpVar=name;
+                                                                if(tmpVar==="" || tmpVar==null)
+                                                                    report.nameErr="Empty field"
+                                                                
+                                                                else
+                                                                {
+                                                                    name = tmpVar;
+                                                                    if (/name/.test("^([a-z] || [A-Z])")) report.nameErr = "only letters allowed"
+                                                                }
+
+                                                                tmpVar=surname;
+                                                                if(tmpVar==="" || tmpVar==null)
+                                                                {
+                                                                    report.surnameErr="Empty field"
+                                                                }
+                                                                else
+                                                                {
+                                                                    surname = tmpVar;
+                                                                    if (/surname/.test("^([a-z] || [A-Z])")) report.surnameErr = "only letters allowed"
+                                                                }
+
+                                                                if(gender==null)
+                                                                {
+                                                                    report.genderErr="No gender selected"
+                                                                }
+
+                                                                tmpVar=birthdate;
+                                                                if (tmpVar==="mm/dd/yyyy" || tmpVar==="dd/mm/yyyy" || tmpVar==="yyyy/mm/dd") report.datetimeErr = "Empty field";
+
+                                                                //Email formatted via form
+
+                                                                return report;
+
+                                                            }
+
+                                                            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                                            /**
+                                                            * Secure Hash Algorithm (SHA256)
+                                                            * http://www.webtoolkit.info/
+                                                            * Original code by Angel Marin, Paul Johnston
+                                                            **/
+
+                                                            //code of SHA256 function
+                                                            function SHA256(s) {
+                                                                var chrsz = 8; var hexcase = 0; function safe_add(x, y) { var lsw = (x & 0xFFFF) + (y & 0xFFFF); var msw = (x >> 16) + (y >> 16) + (lsw >> 16); return (msw << 16) | (lsw & 0xFFFF); }
+                                                                function S(X, n) { return (X >>> n) | (X << (32 - n)); }
+                                                                function R(X, n) { return (X >>> n); }
+                                                                function Ch(x, y, z) { return ((x & y) ^ ((~x) & z)); }
+                                                                function Maj(x, y, z) { return ((x & y) ^ (x & z) ^ (y & z)); }
+                                                                function Sigma0256(x) { return (S(x, 2) ^ S(x, 13) ^ S(x, 22)); }
+                                                                function Sigma1256(x) { return (S(x, 6) ^ S(x, 11) ^ S(x, 25)); }
+                                                                function Gamma0256(x) { return (S(x, 7) ^ S(x, 18) ^ R(x, 3)); }
+                                                                function Gamma1256(x) { return (S(x, 17) ^ S(x, 19) ^ R(x, 10)); }
+                                                                function core_sha256(m, l) {
+                                                                    var K = new Array(0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5, 0x3956C25B, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5, 0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3, 0x72BE5D74, 0x80DEB1FE, 0x9BDC06A7, 0xC19BF174, 0xE49B69C1, 0xEFBE4786, 0xFC19DC6, 0x240CA1CC, 0x2DE92C6F, 0x4A7484AA, 0x5CB0A9DC, 0x76F988DA, 0x983E5152, 0xA831C66D, 0xB00327C8, 0xBF597FC7, 0xC6E00BF3, 0xD5A79147, 0x6CA6351, 0x14292967, 0x27B70A85, 0x2E1B2138, 0x4D2C6DFC, 0x53380D13, 0x650A7354, 0x766A0ABB, 0x81C2C92E, 0x92722C85, 0xA2BFE8A1, 0xA81A664B, 0xC24B8B70, 0xC76C51A3, 0xD192E819, 0xD6990624, 0xF40E3585, 0x106AA070, 0x19A4C116, 0x1E376C08, 0x2748774C, 0x34B0BCB5, 0x391C0CB3, 0x4ED8AA4A, 0x5B9CCA4F, 0x682E6FF3, 0x748F82EE, 0x78A5636F, 0x84C87814, 0x8CC70208, 0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2); var HASH = new Array(0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A, 0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19); var W = new Array(64); var a, b, c, d, e, f, g, h, i, j; var T1, T2; m[l >> 5] |= 0x80 << (24 - l % 32); m[((l + 64 >> 9) << 4) + 15] = l; for (var i = 0; i < m.length; i += 16) {
+                                                                        a = HASH[0]; b = HASH[1]; c = HASH[2]; d = HASH[3]; e = HASH[4]; f = HASH[5]; g = HASH[6]; h = HASH[7]; for (var j = 0; j < 64; j++) { if (j < 16) W[j] = m[j + i]; else W[j] = safe_add(safe_add(safe_add(Gamma1256(W[j - 2]), W[j - 7]), Gamma0256(W[j - 15])), W[j - 16]); T1 = safe_add(safe_add(safe_add(safe_add(h, Sigma1256(e)), Ch(e, f, g)), K[j]), W[j]); T2 = safe_add(Sigma0256(a), Maj(a, b, c)); h = g; g = f; f = e; e = safe_add(d, T1); d = c; c = b; b = a; a = safe_add(T1, T2); }
+                                                                        HASH[0] = safe_add(a, HASH[0]); HASH[1] = safe_add(b, HASH[1]); HASH[2] = safe_add(c, HASH[2]); HASH[3] = safe_add(d, HASH[3]); HASH[4] = safe_add(e, HASH[4]); HASH[5] = safe_add(f, HASH[5]); HASH[6] = safe_add(g, HASH[6]); HASH[7] = safe_add(h, HASH[7]);
+                                                                    }
+                                                                    return HASH;
+                                                                }
+                                                                function str2binb(str) {
+                                                                    var bin = Array(); var mask = (1 << chrsz) - 1; for (var i = 0; i < str.length * chrsz; i += chrsz) { bin[i >> 5] |= (str.charCodeAt(i / chrsz) & mask) << (24 - i % 32); }
+                                                                    return bin;
+                                                                }
+                                                                function Utf8Encode(string) {
+                                                                    string = string.replace(/\r\n/g, '\n'); var utftext = ''; for (var n = 0; n < string.length; n++) {
+                                                                        var c = string.charCodeAt(n); if (c < 128) { utftext += String.fromCharCode(c); }
+                                                                        else if ((c > 127) && (c < 2048)) { utftext += String.fromCharCode((c >> 6) | 192); utftext += String.fromCharCode((c & 63) | 128); }
+                                                                        else { utftext += String.fromCharCode((c >> 12) | 224); utftext += String.fromCharCode(((c >> 6) & 63) | 128); utftext += String.fromCharCode((c & 63) | 128); }
+                                                                    }
+                                                                    return utftext;
+                                                                }
+                                                                function binb2hex(binarray) {
+                                                                    var hex_tab = hexcase ? '0123456789ABCDEF' : '0123456789abcdef'; var str = ''; for (var i = 0; i < binarray.length * 4; i++) {
+                                                                        str += hex_tab.charAt((binarray[i >> 2] >> ((3 - i % 4) * 8 + 4)) & 0xF) +
+                                                                        hex_tab.charAt((binarray[i >> 2] >> ((3 - i % 4) * 8)) & 0xF);
+                                                                    }
+                                                                    return str;
+                                                                }
+                                                                s = Utf8Encode(s); return binb2hex(core_sha256(str2binb(s), s.length * chrsz));
+                                                            }
+                                                                   
+                                                            function HandleSubmitClick() {
+                                                                let username = new String;
+                                                                let email = new String;
+                                                                let password = new String;
+                                                                let name = new String;
+                                                                let surname = new String;
+                                                                let birthdate = new String;
+                                                                let gender = new String;
+
+                                                                username = $("#usernameReg").val();
+                                                                email = $("#emailReg").val();
+                                                                password = $("#passwordReg").val();
+                                                                name = $("#nameReg").val();
+                                                                surname = $("#surnameReg").val();
+                                                                birthdate = $("#birthdateReg").val();
+
+                                                                if ((gender = $("#genderRegM").val()) != null)
+                                                                    gender = $("#genderRegM").val() === "m" ? "m" : "f";
+
+                                                                var report =TestRegisterData(username, email, password, name, surname, birthdate, gender)
+                                                                if (report.isValid()) {
+                                                                    password = SHA256(password);
+                                                                    let usr = new User(username, password, name, surname, gender, email, birthdate);
+                                                                    console.log(usr.Format());
+                                                                        
+                                                                    $.ajax({
+                                                                        type: "POST",
+                                                                        url: "/api/users",
+                                                                        data: JSON.stringify(usr),
+                                                                        contentType: "application/json",
+                                                                        dataType: "text",
+                                                                        success: function(data, status)
+                                                                        {
+                                                                            alert("Success");
+                                                                        }
+                                                                    });   
+                                                                        
+                 
+                                                                }
+                                                                else {
+                                                                    alert(report.Format());
+                                                                }
+    
+                                                            };
+                                                                                                           
+                                                        </script>                                                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <script type="text/javascript">
+                        var loadedArrangements;
+                        var filteredArrangements;
+                        var detailsTriggered;
+                        var createdArrangementsByMe;
+                        var detailsToShow;
+                        $(document).load()
+                        {
+                            $.getJSON
+                            ("/api/arrangements/active",
+                            function (data, status) {
+
+                                loadedArrangements=data;
+                                filteredArrangements=data;
+                                PrintArrangements(loadedArrangements);
+
+                                if(window.localStorage.getItem('Role')!=null)
+                                {
+                                    switch(window.localStorage.getItem('Role'))
+                                    {
+                                        case "Administrator":{RenderAdminEnvironment();   break;}
+                                        case "Tourist":      {RenderTouristEnvironment(); break;}
+                                        case "Manager":      {RenderManagerEnvironment();  break;}
+                                    }
+                                }
+                            }
+                            );
+                        } 
+
+                        function HandleTableClick(elem)
+                        {
+
+                            $(document).ready(function()
+                            {
+                                elem=elem.parentElement;
+
+                                if (detailsTriggered ==true && detailsToShow==elem.id)
+                                {
+                                    document.getElementById("th_details_"+detailsToShow.substring(4)).remove();
+                                    //document.getElementById("accommodations_"+detailsToShow.substring(4)).remove();
+                                    detailsTriggered=false;
+                                    return;
+                                }
+                                if (detailsTriggered ==true && detailsToShow!=elem.id)
+                                {
+                                    document.getElementById("th_details_"+detailsToShow.substring(4)).remove();
+                                    //document.getElementById("accommodations_"+detailsToShow.substring(4)).remove();
+                                    detailsTriggered=false;
+                                }
+
+                                $.getJSON
+                                ("/api/arrangements/"+elem.id.substring(4),
+                                    function (data, status)
+                                    {
+                                        let newHtml= new String();
+                                        newHtml+=
+                                            "<tr><td colspan=\"6\" id=\"th_details_"+elem.id.substring(4)+"\">"+
+                                                "<div id=\"details_"+elem.id.substring(4)+"\">"+
+                                                    "<h3>"+elem.id.substring(4)+"</h3>"+
+                                                    "<img src=\""+data.PosterURL+"\"/>"+"<br/>"+
+                                                    "<p> Location: "+data.Locationn+"</p>"+
+                                                    "<p> Type: "+data.Type+"</p>"+
+                                                    "<p> Starts: "+data.DateStart+"</p>"+
+                                                    "<p> Ends: "+data.DateStop+"</p>"+
+                                                    "<p> Max. Passengers:"+data.MaxPassengers+"</p>"+
+                                                    "<h4>Program:</h4>"+
+                                                    "<p> "+data.Program+"</p>"+
+                                                    "<h4>Description:</h4>"+
+                                                    "<p>"+data.Desc+"</p>"+
+                                                    "<p> Transport: "+data.Transport+"</p>"+
+                                                    "<p> Meeting time:"+data.MeetingTime+"</p>"+
+                                                    "<p> Meeting spot: "+data.MeetingSpot.Address+"</p>"+
+                                                    "<div id=\"map_"+elem.id.substring(4)+"\" class=\"map\"></div>"+
+                                                    "<button onclick=\"HandleGetAccommodations(this)\" type=\"button\" class=\"btn btn-primary\" id=\""+"btn_accommodations_"+elem.id.substring(4)+"\">Check Accommodations</button>"+
+                                                "</div>"+
+                                          "</td></tr>";
+                                
+                                        detailsToShow=elem.id;
+                                        detailsTriggered=true;
+                                        document.getElementById(detailsToShow).outerHTML+=newHtml;
+
+                                        var map = new ol.Map(
+                                            {
+                                                target: 'map_'+elem.id.substring(4),
+                                                layers: [new ol.layer.Tile ({source: new ol.source.OSM()})],
+                                                view: new ol.View(
+                                                    {
+                                                        center: ol.proj.fromLonLat([data.MeetingSpot.GeoLongitude, data.MeetingSpot.GeoLatitude]),
+                                                        zoom:13
+                                                    })
+                                            });
+
+                                         var layer = new ol.layer.Vector({
+                                            source: new ol.source.Vector({
+                                                features: [
+                                                    new ol.Feature({
+                                                        geometry: new ol.geom.Point(ol.proj.fromLonLat([data.MeetingSpot.GeoLongitude, data.MeetingSpot.GeoLatitude]))
+                                                    })
+                                                ]
+                                            })
+                                        });
+                                         map.addLayer(layer);
+                                    }
+                                 );
+                            });
+                        }
+
+                        // TO DO:
+                        function HandleGetAccommodations(elem)
+                        {
+                            $(document).ready(function()
+                            { 
+                                window.localStorage.setItem('AccommodationsToShowFor', elem.id.split("_")[2]);
+                                document.location.href=window.location.protocol + "//" + window.location.host+"/Home/Accommodations";
+                                return;                                  
+                            });
+                        }
+
+                        function IsValidDate(dateStr)
+                        {
+                            return isNaN(dateStr) && !isNaN(Date.parse(dateStr));
+                        }
+
+                        function PresentationToISODateTime(dateTime)
+                        {
+                            let stringParts = dateTime.split("/");
+                            return stringParts[2]+"-"+stringParts[1]+"-"+stringParts[0];
+                        }
+
+                        function CheckTimeRelation(pointOfView, referenceDay)
+                        {
+                            let stringParts = pointOfView.split("-");
+                            let year = parseInt(stringParts[0]);
+                            let month =parseInt(stringParts[1]);
+                            let date = parseInt(stringParts[2]);
+
+                            stringParts = referenceDay.split("-");
+                            let dateNow = parseInt(stringParts[2]);
+                            let monthNow = parseInt(stringParts[1]);
+                            let yearNow = parseInt(stringParts[0]);
+
+                            if (year == yearNow)
+                            {
+                                if (month == monthNow)
+                                {
+                                    if (date == dateNow) return 0;
+                                    else if (date < dateNow) return -1;
+                                    else return 1;//date > dateNow
+                                }
+                                else if (month < monthNow) return -1;
+                                else return 1; //month > monthNow
+                            }
+                            else if (year < yearNow) return -1;
+                            else return 1; // year>yearNow
+                        }
+
+                        function PrintArrangements(data)
+                        {
+                            if(data.length==0)
+                            {
+                                console.log("Nothing to offer");
+                                $('#arrangements_table_container').html("<p class=\"impTxt\">Unfortunately, all arrangements are reserved.<br/> Visit us later or check previous ones. </p>");
+                                return;
+                            }
+
+                            // TABELA ARANZMANA
+                            let arrangements = new String ("<table class=\"table\" id=\"arrangements_table\">");
+                            // RED SA OSNOVNIM INFORMACIJAMA (NASLOVAN LINIJA TABELE)
+                            arrangements+=
+                                "<tr>"+
+                                    "<th>Name</th>"+
+                                    "<th>From</th>"+
+                                    "<th>Till</th>"+
+                                    "<th>Total days</th>"+ 
+                                    "<th>Price from:</th>"+
+                                    "<th>&nbsp</th>"+
+                                "</tr>";
+
+                                
+                            for(arrangement in data)
+                            {
+                                // RED SA OSNOVNIM INFORMACIJAMA (PODACI)
+                                arrangements +=
+                                "<tr id="+"\"btn_"+data[arrangement].Name+"\" >"+
+                                    "<td"+" onclick=\"HandleTableClick(this)\""+" style=\"cursor:pointer; border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + data[arrangement].Name +"</td>"+
+                                    "<td"+" onclick=\"HandleTableClick(this)\""+" style=\"cursor:pointer; border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + data[arrangement].DateStart + "</td>"+
+                                    "<td"+" onclick=\"HandleTableClick(this)\""+" style=\"cursor:pointer; border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + data[arrangement].DateStop + "</td>"+
+                                    "<td"+" onclick=\"HandleTableClick(this)\""+" style=\"cursor:pointer; border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + data[arrangement].Days + "</td>"+                
+                                    "<td"+" onclick=\"HandleTableClick(this)\""+" style=\"cursor:pointer; border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + data[arrangement].MinPrice +"</td>"+
+                                    "<td"+" onclick=\"HandleTableClick(this)\""+" style=\"cursor:pointer; border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + 
+                                        "<img src=\"" + data[arrangement].PosterURL + "\" style=\"width:35%; height:35%; border-radius:50%; \"/>"+
+                                    "</td>"+
+                                "</tr>";
+                            }
+                            arrangements += "</table>";
+                            detailsTriggered=false;
+                            $('#arrangements_table_container').html(arrangements);
+                        }
+
+                        function HandleArrangementDelete(elem)
+                        {
+                            
+                            //"api/arrangements/delete/{id}"
+                            $.ajax({
+                                type: "PUT",
+                                url: "/api/arrangements/delete/"+elem.id.split('_')[2],
+                                headers :{'Authorization' : window.localStorage.getItem('TALoginToken')},
+                                success: function (data, status) 
+                                { 
+
+                                    document.getElementById("btn_"+elem.id.split('_')[2]).remove();
+                                    alert('Success');
+                                    
+                                },
+                                error: function(jqXhr, textStatus, errorMessage)
+                                {
+                                    alert("Deleting arrangement failed with error: "+jqXhr.responseText);
+                                }
+                            });
+                        }
+                        
+                        function HandleArrangementModify(elem)
+                        {
+                            window.localStorage.setItem('UpdateTarget', elem.id.split('_')[2])
+                            document.location.href=window.location.protocol + "//" + window.location.host+"/Manager/Arrangements";
+                        }
+                        
+
+                        function RenderManagerExtraButtons()
+                        {
+                            $(document).ready(function()
+                            {
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/api/arrangements/activeCreatedBy/"+window.localStorage.getItem("username"),
+                                    headers :{'Authorization' : window.localStorage.getItem('TALoginToken')},
+                                    success: function (data, status) 
+                                    { 
+                                        let newHTML;
+                                        for(arrangement in data)
+                                        {
+                                            newHTML=
+                                            "<td><button id=\"btn_delete_"+data[arrangement]+"\"  style=\"color:#CD5C5C;\" onclick=\"HandleArrangementDelete(this)\">Delete</button></td>"+
+                                            "<td><button id=\"btn_modify_"+data[arrangement]+"\"  style=\"color:#4169e1;\" onclick=\"HandleArrangementModify(this)\">Modify</button></td>";
+                                            document.getElementById('btn_'+data[arrangement]).innerHTML+=newHTML;
+                                        }
+                                    },
+                                    error: function(jqXhr, textStatus, errorMessage)
+                                    {
+                                        alert("Error loading managers arrangements: "+jqXhr.responseText);
+                                    }
+                                });
+                            });
+                        }
+                        
+                        function FilterBySearch()
+                        {
+                            let dateStartMin, dateStopMin, dateStartMax, dateStopMax, transport, type, name;
+                            $(document).ready(function()
+                            {
+                                let tmpCopy = $.extend( true, {}, loadedArrangements ); // Deep copy
+
+                                dateStartMin =$("#search_from_min").val();
+                                dateStopMin=$("#search_till_min").val();
+                                dateStartMax =$("#search_from_max").val();
+                                dateStopMax=$("#search_till_max").val();
+                                transport =$("#search_transport").val();
+                                type=$("#search_type").val();
+                                name=$("#search_name").val();
+
+                                let errStr="";
+                                let toRemIDXes= [];
+                                if(dateStartMin != "")
+                                {
+                                    if(IsValidDate(dateStartMin))
+                                    {
+                                        for(arrangement in tmpCopy)
+                                            if(CheckTimeRelation(PresentationToISODateTime(tmpCopy[arrangement].DateStart), dateStartMin)<0) toRemIDXes.push(arrangement);
+                                        
+                                        for(idx in toRemIDXes) delete(tmpCopy[toRemIDXes[idx]]);
+                                    }
+                                    else
+                                    {errStr+="Invalid Minimal Date Start\n ";}
+                                }
+
+                                toRemIDXes= [];
+                                if(dateStopMin != "")
+                                {
+                                    if(IsValidDate(dateStopMin))
+                                    {
+                                        for(arrangement in tmpCopy)
+                                            if(CheckTimeRelation(PresentationToISODateTime(tmpCopy[arrangement].DateStop), dateStopMin)<0) toRemIDXes.push(arrangement);
+                                        
+                                        for(idx in toRemIDXes) delete(tmpCopy[toRemIDXes[idx]]);
+                                    }
+                                    else
+                                    {errStr+="Invalid Minimal Date Stop\n";}
+                                }
+
+                                toRemIDXes= [];
+                                if(dateStartMax != "")
+                                {
+                                    if(IsValidDate(dateStartMax))
+                                    {
+                                        for(arrangement in tmpCopy)
+                                            if(CheckTimeRelation(PresentationToISODateTime(tmpCopy[arrangement].DateStart, dateStartMax))>0) toRemIDXes.push(arrangement);
+                                        
+                                        for(idx in toRemIDXes) delete(tmpCopy[toRemIDXes[idx]]);
+                                    }
+                                    else
+                                    {errStr+="Invalid Maximal Date Start\n";}
+                                }
+
+                                toRemIDXes= [];
+                                if(dateStopMax != "")
+                                {
+                                    if(IsValidDate(dateStopMax))
+                                    {
+                                        for(arrangement in tmpCopy)
+                                            if(CheckTimeRelation(PresentationToISODateTime(tmpCopy[arrangement].DateStop), dateStopMax)>0) toRemIDXes.push(arrangement);
+                                        
+                                        for(idx in toRemIDXes) delete(tmpCopy[toRemIDXes[idx]]);
+                                    }
+                                    else
+                                    {errStr+="Invalid Maximal Date Stop\n";}
+                                }
+
+                                if(name!="")
+                                {
+                                    toRemIDXes= [];
+                                    for(arrangement in tmpCopy)
+                                        if(!tmpCopy[arrangement].Name.includes(name)) toRemIDXes.push(arrangement);
+
+                                    for(idx in toRemIDXes) delete(tmpCopy[toRemIDXes[idx]]);
+                                }
+ 
+                                if(type!="any")
+                                {
+                                    toRemIDXes= [];
+                                    for(arrangement in tmpCopy)
+                                        if(!tmpCopy[arrangement].Type.toLowerCase().includes(type.toLowerCase()))toRemIDXes.push(arrangement);
+                                        
+                                    for(idx in toRemIDXes) delete(tmpCopy[toRemIDXes[idx]]);
+                                }
+                               
+                                if(transport!="any")
+                                {
+                                    toRemIDXes= [];
+                                    for(arrangement in tmpCopy)
+                                    {
+                                        if(transport=="combined" && !tmpCopy[arrangement].Transport.toLowerCase().includes(transport)) toRemIDXes.push(arrangement);                                  
+                                        else  if(transport!="combined" && tmpCopy[arrangement].Transport.toLowerCase() !=transport) toRemIDXes.push(arrangement);
+
+                                    }
+                                    for(idx in toRemIDXes) delete(tmpCopy[toRemIDXes[idx]]);
+                                }
+                                if(errStr!="")alert("Bad search params excluded from filter:\n"+errStr);
+                                filteredArrangements=tmpCopy;
+                                PrintArrangements(tmpCopy);
+                                if(window.localStorage.getItem('Role')=='Manager')
+                                    RenderManagerExtraButtons();
+                            });
+                            
+                            if(window.localStorage.getItem('Role')=='Manager')
+                                RenderManagerExtraButtons();
+                        }
+
+                        function HandleSearchReload()
+                        {
+                            $("#search_from_min").val("");
+                            $("#search_from_max").val("");
+                            $("#search_till_min").val("");
+                            $("#search_till_max").val("");
+
+                            $("#search_from_min").val("");
+                            $("#search_from_max").val("");
+                            $("#search_till_min").val("");
+                            $("#search_till_max").val("");
+
+                            $("#search_transport").prop("selectedIndex", 8);
+                            $("#search_type").prop("selectedIndex", 4);
+                            $("#search_name").val("");
+                            filteredArrangements=loadedArrangements;
+                            PrintArrangements(loadedArrangements);
+                            if(window.localStorage.getItem('Role')=='Manager')
+                                RenderManagerExtraButtons();
+                        }
+
+                    </script>
+
+                    <div class="col-lg-9">
+                        <div id="arrangements_search">
+
+                            <table class="table" style="border:medium solid gray;">
+                                <caption class="caption" style="padding:10px 10px 10px 10px; font-size:large; padding-bottom:3%; font-family:Arial; font-weight:bold; color:royalblue; float:left;">Arrangements Search</caption>
+                                <tr style="background-color:lightgray;">
+                                    <th colspan="2">Start dates</th>
+                                    <th colspan="2">Ending dates</th>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <input type="date" name="search_from_min" id="search_from_min" tabindex="1" placeholder="dd-mm-yyyy" value="">
+                                        <label for="search_from_min" style="display:inline-block; float:left;">Min:</label>
+                                    </td>
+
+                                    <td>
+                                        <input type="date" name="search_from_max" id="search_from_max" tabindex="1" placeholder="dd-mm-yyyy" value="">
+                                        <label for="search_from_max" style="display:inline-block; float:left; ">Max:</label>
+                                    </td>
+
+                                    <td>
+                                        <input type="date" name="search_till_min" id="search_till_min" tabindex="1" placeholder="dd-mm-yyyy" value="">
+                                        <label for="search_till_min" style="display:inline-block; float:left; ">Min:</label>
+                                    </td>
+
+                                    <td>
+                                        <input type="date" name="search_till_max" id="search_till_max" tabindex="1" placeholder="dd-mm-yyyy" value="">
+                                        <label for="search_till_max" style="display:inline-block; float:left; ">Max:</label>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th colspan="2">
+                                        <select name="search_transport" id="search_transport">
+                                            <option value="airplane">Airplane</option>
+                                            <option value="ship">Ship</option>
+                                            <option value="boat">Boat</option>
+                                            <option value="train">Train</option>
+                                            <option value="bus">Bus</option>
+                                            <option value="minivan">Minivan</option>
+                                            <option value="car">Car</option>
+                                            <option value="combined">Combined</option>
+                                            <option value="any" selected="selected">Any</option>
+                                        </select>
+                                        <label for="search_transport" style="display:inline-block; float:left; ">Transport type:</label>
+                                    </th>
+
+                                    <th colspan="2">
+                                        <select name="search_type" id="search_type">
+                                            <option value="EP">European Plan (EP)</option>
+                                            <option value="B&B">Bed &amp; Breakfast (B&amp;B)</option>
+                                            <option value="DP">Demi Pansion (DP)</option>
+                                            <option value="FP">Full Pansion (FP)</option>
+                                            <option value="any" selected="selected">Any</option>
+                                        </select>
+                                        <label for="search_type" style="display:inline-block; float:left; ">Arrangement type:</label>
+                                    </th>
+
+                                </tr>
+
+                                <tr>
+                                    <th colspan="2">
+                                        <input id="search_name" name="search_name" type="search" placeholder="Name" />
+                                        <label for="search_name" style="display:inline-block; float:left; ">Arrangement name:</label>
+                                    </th>
+
+                                    <th colspan="2">
+                                        <input style="float:left; width:30%;" type="button" name="search_search" id="search_search" class="form-control btn btn-register" value="Search" />&nbsp;&nbsp;
+                                        <input style="width:30%;" type="button" name="search_reload" id="search_reload" class="form-control btn btn-login" value="Refresh" />
+
+                                    </th>
+                                </tr>
+
+                                <tr style="background-color:lightgrey;">
+                                    <th style="text-align:right;"><strong>Sort: </strong></th>
+                                    <th><input style="font-size:12px; padding: 4px 0;" type="button" name="sort_name_asc" id="sort_name_asc" value="Name Asc" class="form-control btn btn-login" /></th>
+                                    <th><input style="font-size:12px; padding: 4px 0;" type="button" name="sort_datestart_asc" id="sort_datestart_asc" value="Date Start Asc" class="form-control btn btn-login" /></th>
+                                    <th><input style="font-size:12px; padding: 4px 0;" type="button" name="sort_datestop_asc" id="sort_datestop_asc" value="Date Stop Asc" class="form-control btn btn-login" /></th>
+                                </tr>
+
+                                <tr style="background-color:lightgrey;">
+                                    <th>&nbsp;</th>
+                                    <th><input style="font-size:12px; padding: 4px 0; background-color: #1CB94E;" type="button" name="sort_name_desc" id="sort_name_desc" value="Name Desc" class="form-control btn btn-login" /></th>
+                                    <th><input style="font-size:12px; padding: 4px 0; background-color: #1CB94E;" type="button" name="sort_datestart_desc" id="sort_datestart_desc" value="Date Start Desc" class="form-control btn btn-login" /></th>
+                                    <th><input style="font-size:12px; padding: 4px 0; background-color: #1CB94E;" type="button" name="sort_datestop_desc" id="sort_datestop_desc" value="Date Stop Desc" class="form-control btn btn-login" /></th>
+                                </tr>
+
+                            </table>
+                            <script>
+                                function HandleSortNameAsc()
+                                {
+                                    let minimum;
+                                    for (let swLoc = 0; swLoc < filteredArrangements.length-1; ++swLoc)
+                                    {
+                                        minimum = swLoc;
+                                        for (let toCompare = swLoc + 1; toCompare < filteredArrangements.length; ++toCompare)
+                                        {
+                                            if (filteredArrangements[toCompare].Name < filteredArrangements[minimum].Name)
+                                                minimum = toCompare;
+                                        }
+                                        if (swLoc != minimum)
+                                        {
+                                            filteredArrangements.push(filteredArrangements[swLoc]);     // Lokaciju koju popunjavam trenutnu vrijednost smjestim na kraj
+                                            filteredArrangements[swLoc]=filteredArrangements[minimum];  // Minimum ubacim gdje treba
+                                            filteredArrangements.splice(minimum,1);                       // Obrisem staru lokaciju minimuma
+
+                                        }
+                                    }
+                                    PrintArrangements(filteredArrangements);
+                                    if(window.localStorage.getItem('Role')=='Manager')
+                                        RenderManagerExtraButtons();
+                                };
+
+                                function HandleSortNameDesc()
+                                {
+                                    let minimum;
+                                    for (let swLoc = 0; swLoc < filteredArrangements.length-1; ++swLoc)
+                                    {
+                                        minimum = swLoc;
+                                        for (let toCompare = swLoc + 1; toCompare < filteredArrangements.length; ++toCompare)
+                                        {
+                                            if (filteredArrangements[toCompare].Name > filteredArrangements[minimum].Name)
+                                                minimum = toCompare;
+                                        }
+                                        if (swLoc != minimum)
+                                        {
+                                            filteredArrangements.push(filteredArrangements[swLoc]);     // Lokaciju koju popunjavam trenutnu vrijednost smjestim na kraj
+                                            filteredArrangements[swLoc]=filteredArrangements[minimum];  // Minimum ubacim gdje treba
+                                            filteredArrangements.splice(minimum,1);                       // Obrisem staru lokaciju minimuma
+
+                                        }
+                                    }
+                                    PrintArrangements(filteredArrangements);
+                                    if(window.localStorage.getItem('Role')=='Manager')
+                                        RenderManagerExtraButtons();
+                                };
+
+                                function HandleSortDateStartAsc()
+                                {
+                                    let minimum;
+                                    for (let swLoc = 0; swLoc < filteredArrangements.length-1; ++swLoc)
+                                    {
+                                        minimum = swLoc;
+                                        for (let toCompare = swLoc + 1; toCompare < filteredArrangements.length; ++toCompare)
+                                        {
+                                            if (CheckTimeRelation(PresentationToISODateTime(filteredArrangements[toCompare].DateStart), PresentationToISODateTime(filteredArrangements[minimum].DateStart)) < 0)
+                                                minimum = toCompare;
+                                        }
+                                        if (swLoc != minimum)
+                                        {
+                                            filteredArrangements.push(filteredArrangements[swLoc]);     // Lokaciju koju popunjavam trenutnu vrijednost smjestim na kraj
+                                            filteredArrangements[swLoc]=filteredArrangements[minimum];  // Minimum ubacim gdje treba
+                                            filteredArrangements.splice(minimum,1);                       // Obrisem staru lokaciju minimuma
+
+                                        }
+                                    }
+                                    PrintArrangements(filteredArrangements);
+                                    if(window.localStorage.getItem('Role')=='Manager')
+                                        RenderManagerExtraButtons();
+                                };
+
+                                function HandleSortDateStartDesc()
+                                {
+                                    let minimum;
+                                    for (let swLoc = 0; swLoc < filteredArrangements.length - 1; ++swLoc)
+                                    {
+                                        minimum = swLoc;
+                                        for (let toCompare = swLoc + 1; toCompare < filteredArrangements.length; ++toCompare)
+                                        {
+                                            if (CheckTimeRelation(PresentationToISODateTime(filteredArrangements[toCompare].DateStart), PresentationToISODateTime(filteredArrangements[minimum].DateStart)) > 0)
+                                                minimum = toCompare;
+                                        }
+                                        if (swLoc != minimum)
+                                        {
+                                            filteredArrangements.push(filteredArrangements[swLoc]);     // Lokaciju koju popunjavam trenutnu vrijednost smjestim na kraj
+                                            filteredArrangements[swLoc]=filteredArrangements[minimum];  // Minimum ubacim gdje treba
+                                            filteredArrangements.splice(minimum,1);                       // Obrisem staru lokaciju minimuma
+                                        }
+                                    }
+                                    PrintArrangements(filteredArrangements);
+                                    if(window.localStorage.getItem('Role')=='Manager')
+                                        RenderManagerExtraButtons();
+                                };
+
+                                function HandleSortDateStopAsc()
+                                {
+                                    let minimum;
+                                    for (let swLoc = 0; swLoc < filteredArrangements.length-1; ++swLoc)
+                                    {
+                                        minimum = swLoc;
+                                        for (let toCompare = swLoc + 1; toCompare < filteredArrangements.length; ++toCompare)
+                                        {
+                                            if (CheckTimeRelation(PresentationToISODateTime(filteredArrangements[toCompare].DateStop), PresentationToISODateTime(filteredArrangements[minimum].DateStop)) < 0)
+                                                minimum = toCompare;
+                                        }
+                                        if (swLoc != minimum)
+                                        {
+                                            filteredArrangements.push(filteredArrangements[swLoc]);     // Lokaciju koju popunjavam trenutnu vrijednost smjestim na kraj
+                                            filteredArrangements[swLoc]=filteredArrangements[minimum];  // Minimum ubacim gdje treba
+                                            filteredArrangements.splice(minimum,1);                       // Obrisem staru lokaciju minimuma
+
+                                        }
+                                    }
+                                    PrintArrangements(filteredArrangements);
+                                    if(window.localStorage.getItem('Role')=='Manager')
+                                        RenderManagerExtraButtons();
+                                };
+
+                                function HandleSortDateStopDesc()
+                                {
+                                    let minimum;
+                                    for (let swLoc = 0; swLoc < filteredArrangements.length - 1; ++swLoc)
+                                    {
+                                        minimum = swLoc;
+                                        for (let toCompare = swLoc + 1; toCompare < filteredArrangements.length; ++toCompare)
+                                        {
+                                            if (CheckTimeRelation(PresentationToISODateTime(filteredArrangements[toCompare].DateStop), PresentationToISODateTime(filteredArrangements[minimum].DateStop)) > 0)
+                                                minimum = toCompare;
+                                        }
+                                        if (swLoc != minimum)
+                                        {
+                                            filteredArrangements.push(filteredArrangements[swLoc]);     // Lokaciju koju popunjavam trenutnu vrijednost smjestim na kraj
+                                            filteredArrangements[swLoc]=filteredArrangements[minimum];  // Minimum ubacim gdje treba
+                                            filteredArrangements.splice(minimum,1);                       // Obrisem staru lokaciju minimuma
+                                        }
+                                    }
+                                    PrintArrangements(filteredArrangements);
+                                    if(window.localStorage.getItem('Role')=='Manager')
+                                        RenderManagerExtraButtons();
+                                };
+
+                                $(document).ready(function () {
+                                    
+                                    // Register all events
+                                    if($('#register-submit')!=null)
+                                        document.getElementById("register-submit").addEventListener('click', HandleSubmitClick);
+    
+                                    if($('#login-submit')!=null) $('#register-submit').on('click', HandleLoginClick);
+                                    document.getElementById("login-submit").addEventListener('click', HandleLoginClick);
+
+                                    if(window.localStorage.getItem('Role')!=null)
+
+                                    $('#search_search').on('click', FilterBySearch);
+                                    $('#search_reload').on('click', HandleSearchReload);
+
+                                    $('#sort_name_asc').on      ('click', HandleSortNameAsc);
+                                    $('#sort_name_desc').on     ('click', HandleSortNameDesc);
+                                    $('#sort_datestart_asc').on ('click', HandleSortDateStartAsc);
+                                    $('#sort_datestart_desc').on('click', HandleSortDateStartDesc);
+                                    $('#sort_datestop_asc').on  ('click', HandleSortDateStopAsc);
+                                    $('#sort_datestop_desc').on ('click', HandleSortDateStopDesc);                                 
+                                });
+                            </script>
+
+                        </div>
+                        <div id="arrangements_table_container"></div>
+
+                    </div>
+
+                </div>    
+            </div>
+    </body>
+</html>

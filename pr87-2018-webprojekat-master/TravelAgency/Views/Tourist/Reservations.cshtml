@@ -1,0 +1,407 @@
+﻿<html>
+
+<head>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+    <script type="text/javascript" src="~/Scripts/LoginRegister.js"></script>
+
+    <link rel="stylesheet" href="~/Content/Site.css" />
+    <link rel="stylesheet" href="~/Content/LoginRegister.css" />
+    <link rel="stylesheet" href="~/Content/NavBar.css" />
+    <link rel="stylesheet" href="~/Content/v6.6.1-dist/ol.css" type="text/css" />
+    <style>
+        .map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+    <script type="text/javascript" src="~/Content/v6.6.1-dist/ol.js"></script>
+
+</head>
+
+<body style="background-image:url(../../Content/Images/summer.jpg); background-attachment:fixed; ">
+
+    <div class="container-fluid">
+
+        <nav class="navbar navbar-default">
+            <div class="container">
+
+                <div class="navbar-header">
+                    <a style="cursor:pointer;" onko class="navbar-brand" onclick='return TriggerBack()'>Back</a>
+                    <script>
+                        function TriggerBack() {
+                            $(document).ready(function () {
+                                if (history.length > 2)
+                                    history.back();
+                                else
+                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                            });
+                        }
+                    </script>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="container">
+        <div class="row">
+
+            <script>
+
+                function HandleUnitReservationCancel(elem) 
+                {
+                    let postParams = elem.id.split("_");
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/reservations/unreserve",
+                        data: JSON.stringify({
+                            'arrangement': postParams[2], 'accommodation': postParams[3],
+                            'unit': postParams[4], "user": window.localStorage.getItem("username")
+                        }),
+                        contentType: "application/json",
+                        dataType: "text",
+                        headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                        success: function (data, status) {
+                            document.getElementById("row_" + postParams[2] + "_" + postParams[3] + "_" + postParams[4]).style.backgroundColor = "IndianRed";
+                            document.getElementById("row_" + postParams[2] + "_" + postParams[3] + "_" + postParams[4]).firstChild.innerHTML += " [CANCELED]";
+                            document.getElementById("btn_reserveCancel_" + postParams[2] + "_" + postParams[3] + "_" + postParams[4]).disabled = true;
+                        },
+                        error: function (jqXhr, textStatus, errorMessage) {
+                            if (jqXhr.status == 405 || jqXhr.status == 401)
+                            {
+                                if (jqXhr.status == 405 && confirm("Cancelation failed: " + jqXhr.responseText)) {
+                                    window.localStorage.removeItem("username");
+                                    window.localStorage.removeItem('TALoginToken');
+                                    window.localStorage.removeItem('Role');
+                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                                }
+                                else alert("Cancelation failed: " + jqXhr.responseText);
+                                
+                            }
+                        }
+                    });
+                    
+                }
+
+                function HandleArrangementComment(elem) {
+                    let arrangement = elem.id.split('_')[2];
+                    let text = document.getElementById('comment_ta_' + arrangement).value;
+                    let rate = document.getElementById('comment_rg_' + arrangement).value;
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/reservations/comment",
+                        contentType: "application/json",
+                        dataType: "text",
+                        headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                        data: JSON.stringify({ 'uid': window.localStorage.getItem('username'), 'aid': arrangement, 'txt': text, 'rating': rate }),
+                        success: function (data, status) {
+                            document.getElementById('comment_ta_' + arrangement).value="";
+                            document.getElementById('comment_rg_' + arrangement).value="3";
+                        },
+                        error: function (jqXhr, textStatus, errorMessage)
+                        {
+                            alert("An error occured while posting comment:"+jqXhr.responseText);
+                        }
+                    });
+                }
+
+                $(document).load()
+                {
+                    if (window.localStorage.getItem("username") == null) document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                    $(document).ready(function () {
+                        let newHtml = "";
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/api/reservations/" + window.localStorage.getItem("username"),
+                            contentType: "application/json",
+                            dataType: "text",
+                            headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                            success: function (data, status)
+                            {
+                                data = JSON.parse(data);
+                                newHtml = "";
+                                if (Object.keys(data.Incoming).length == 0) newHtml += "<h4 style=\"color:royalblue;\">Incoming reservations: None</h4>";
+                                else {
+                                    newHtml += "<h4 style=\"color:royalblue;\">Incoming reservations:</h4>";
+                                    for (let key in data.Incoming) {
+                                        newHtml +=
+                                        "<table class=\"table\">" +
+                                            "<tr style=\"background-color: lightgray;\">" +
+                                                "<td colspan=\"8\" style=\"text-align: center; vertical-align: middle;\"><strong>Accommodations for: " + key + "</strong></td>" +
+                                            "</tr>" +
+                                            "<tr style=\"background-color: #fff4a5;\">" +
+                                                "<th>Name</th>" +
+                                                "<th>Type</th>" +
+                                                "<th>Location</th>" +
+                                                "<th>Stars</th>" +
+                                                "<th>Pool</th>" +
+                                                "<th>Spa</th>" +
+                                                "<th>Dissabled<br>Compatible</th>" +
+                                                "<th>WiFi</th>" +
+                                            "</tr>";
+                                        for (accommodation in data.Incoming[key]) {
+                                            newHtml +=
+                                            "<tr style=\"background-color: #DAF7A6;\">" +
+                                                "<td>" +
+                                                    "<u>" + data.Incoming[key][accommodation].Name + "</u>"+
+                                                "</td>" +
+                                                "<td>" + data.Incoming[key][accommodation].Type + "</td>" +
+                                                "<td>" + data.Incoming[key][accommodation].Location + "</td>" +
+                                                "<td>" + (data.Incoming[key][accommodation].Type != "Hotel" ? "/" : data.Incoming[key][accommodation].Stars) + "</td>" +
+                                                "<td>" + (data.Incoming[key][accommodation].Pool == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data.Incoming[key][accommodation].Spa == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data.Incoming[key][accommodation].DisabledCompatible == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data.Incoming[key][accommodation].WiFi == true ? "YES" : "NO") + "</td>" +
+                                            "</tr>";
+
+                                            newHtml += "<tr><th colspan=\"8\" style=\"text-align:center;\">Units</th></tr>";
+                                            newHtml +=
+                                                "<tr>" +
+                                                    "<th colspan=\"3\">Unit Name</th>" +
+                                                    "<th colspan=\"2\">Capacity</th>" +
+                                                    "<th>Pets<br>Allowed</th>" +
+                                                    "<th>Price</th>" +
+                                                    "<th>&nbsp</th>" +
+                                                "</tr>";
+
+                                            for (unit in data.Incoming[key][accommodation].Units) {
+
+                                                newHtml +=
+                                                "<tr id=\"row_" + key + "_" + data.Incoming[key][accommodation].Name + "_" + (data.Incoming[key][accommodation].Units)[unit].UID + "\">" +
+                                                    "<td colspan=\"3\"><b>" + (data.Incoming[key][accommodation].Units)[unit].UID + "</b></td>" +
+                                                    "<td colspan=\"2\">" + (data.Incoming[key][accommodation].Units)[unit].MaxGuessts + "</td>" +
+                                                    "<td>" + ((data.Incoming[key][accommodation].Units)[unit].PetAllowed == true ? "YES" : "NO") + "</td>" +
+                                                    "<td> " + (data.Incoming[key][accommodation].Units)[unit].Price + "</td>" +
+                                                    "<td>" +
+                                                        "<button id=\"btn_reserveCancel_" + key + "_" + data.Incoming[key][accommodation].Name + "_" + (data.Incoming[key][accommodation].Units)[unit].UID + "\">Cancel" + "</button>" +
+                                                    "</td>" +
+                                                "</tr>";
+                                            }
+                                        }
+                                        newHtml += "</table>";
+
+                                    }
+                                }
+
+
+                                if (Object.keys(data.Ongoing).length == 0) newHtml += "<h4 style=\"color:royalblue;\">Ongoing reservations: None</h4>";
+                                else {
+                                    newHtml += "<h4 style=\"color:royalblue;\">Ongoing reservations:</h4>";
+                                    for (let key in data.Ongoing) {
+                                        newHtml +=
+                                        "<table class=\"table\">" +
+                                            "<tr style=\"background-color: lightgray;\">" +
+                                                "<td colspan=\"8\" style=\"text-align: center; vertical-align: middle;\"><strong>Accommodations for: " + key + "</strong></td>" +
+                                            "</tr>" +
+                                            "<tr style=\"background-color: #fff4a5;\">" +
+                                                "<th>Name</th>" +
+                                                "<th>Type</th>" +
+                                                "<th>Location</th>" +
+                                                "<th>Stars</th>" +
+                                                "<th>Pool</th>" +
+                                                "<th>Spa</th>" +
+                                                "<th>Dissabled<br>Compatible</th>" +
+                                                "<th>WiFi</th>" +
+                                            "</tr>";
+                                        for (accommodation in data.Ongoing[key]) {
+                                            newHtml +=
+                                            "<tr style=\"background-color: #DAF7A6;\">" +
+                                                "<td><u>" + data.Ongoing[key][accommodation].Name + "</u></td>" +
+                                                "<td>" + data.Ongoing[key][accommodation].Type + "</td>" +
+                                                "<td>" + data.Ongoing[key][accommodation].Location + "</td>" +
+                                                "<td>" + (data.Ongoingg[key][accommodation].Type != "Hotel" ? "/" : data.Ongoingg[key][accommodation].Stars) + "</td>" +
+                                                "<td>" + (data.Ongoing[key][accommodation].Pool == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data.Ongoing[key][accommodation].Spa == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data.Ongoing[key][accommodation].DisabledCompatible == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data.Ongoing[key][accommodation].WiFi == true ? "YES" : "NO") + "</td>" +
+                                            "</tr>";
+
+                                            newHtml += "<tr><th colspan=\"8\" style=\"text-align:center;\">Units</th></tr>";
+                                            newHtml +=
+                                                "<tr>" +
+                                                    "<th colspan=\"3\">Unit Name</th>" +
+                                                    "<th colspan=\"2\">Capacity</th>" +
+                                                    "<th>Pets<br>Allowed</th>" +
+                                                    "<th>Price</th>" +
+                                                    "<th>&nbsp</th>" +
+                                                "</tr>";
+
+                                            for (unit in data.Ongoing[key][accommodation].Units) {
+
+                                                newHtml +=
+                                                "<tr id=\"row_" + key + "_" + data.Ongoing[key][accommodation].Name + "_" + (data.Ongoing[key][accommodation].Units)[unit].UID + "\">" +
+                                                    "<td colspan=\"3\"><b>" + (data.Ongoing[key][accommodation].Units)[unit].UID + "</b></td>" +
+                                                    "<td colspan=\"2\">" + (data.Incoming[key][accommodation].Units)[unit].MaxGuessts + "</td>" +
+                                                    "<td>" + ((data.Ongoing[key][accommodation].Units)[unit].PetAllowed == true ? "YES" : "NO") + "</td>" +
+                                                    "<td> " + (data.Ongoing[key][accommodation].Units)[unit].Price + "</td>" +
+                                                "</tr>";
+                                            }
+                                        }
+                                        newHtml += "</table>";
+                                    }
+                                }
+                                document.getElementById("reservations_table_container_1").innerHTML += newHtml;
+
+                                newHtml = "";
+                                if (Object.keys(data.Canceled).length == 0) newHtml += "<h4 style=\"color:royalblue;\">Canceled reservations: None</h4>";
+                                else {
+                                    newHtml += "<h4 style=\"color:royalblue;\">Canceled reservations:</h4>";
+                                    for (let key in data.Canceled) {
+                                        newHtml +=
+                                        "<table class=\"table\">" +
+                                            "<tr style=\"background-color: lightgray;\">" +
+                                                "<td colspan=\"8\" style=\"text-align: center; vertical-align: middle;\"><strong>Accommodations for: " + key + "</strong></td>" +
+                                            "</tr>" +
+                                            "<tr style=\"background-color: #fff4a5;\">" +
+                                                "<th>Name</th>" +
+                                                "<th>Type</th>" +
+                                                "<th>Location</th>" +
+                                                "<th>Stars</th>" +
+                                                "<th>Pool</th>" +
+                                                "<th>Spa</th>" +
+                                                "<th>Dissabled<br>Compatible</th>" +
+                                                "<th>WiFi</th>" +
+                                            "</tr>";
+                                        for (accommodation in data.Canceled[key]) {
+                                            newHtml +=
+                                            "<tr style=\"background-color: #DAF7A6;\">" +
+                                                "<td><u>" + data.Canceled[key][accommodation].Name + "</u></td>" +
+                                                "<td>" + data.Canceled[key][accommodation].Type + "</td>" +
+                                                "<td>" + data.Canceled[key][accommodation].Location + "</td>" +
+                                                "<td>" + (data.Canceled[key][accommodation].Type != "Hotel" ? "/" : data.Canceled[key][accommodation].Stars) + "</td>" +
+                                                "<td>" + (data.Canceled[key][accommodation].Pool == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data.Canceled[key][accommodation].Spa == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data.Canceled[key][accommodation].DisabledCompatible == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data.Canceled[key][accommodation].WiFi == true ? "YES" : "NO") + "</td>" +
+                                            "</tr>";
+
+                                            newHtml += "<tr><th colspan=\"8\" style=\"text-align:center;\">Units</th></tr>";
+                                            newHtml +=
+                                                "<tr>" +
+                                                    "<th colspan=\"3\">Unit Name</th>" +
+                                                    "<th colspan=\"2\">Capacity</th>" +
+                                                    "<th>Pets<br>Allowed</th>" +
+                                                    "<th>Price</th>" +
+                                                    "<th>&nbsp</th>" +
+                                                "</tr>";
+
+                                            for (unit in data.Canceled[key][accommodation].Units) {
+
+                                                newHtml +=
+                                                "<tr id=\"row_" + key + "_" + data.Canceled[key][accommodation].Name + "_" + (data.Canceled[key][accommodation].Units)[unit].UID + "\">" +
+                                                    "<td colspan=\"3\"><b>" + (data.Canceled[key][accommodation].Units)[unit].UID + "</b></td>" +
+                                                    "<td colspan=\"2\">" + (data.Canceled[key][accommodation].Units)[unit].MaxGuessts + "</td>" +
+                                                    "<td>" + ((data.Canceled[key][accommodation].Units)[unit].PetAllowed == true ? "YES" : "NO") + "</td>" +
+                                                    "<td> " + (data.Canceled[key][accommodation].Units)[unit].Price + "</td>" +
+                                                "</tr>";
+                                            }
+                                        }
+                                        newHtml += "</table>";
+                                    }
+                                }
+
+                                if (Object.keys(data.Passed).length == 0) newHtml += "<h4 style=\"color:royalblue;\">Passed reservations: None</h4>";
+                                else {
+                                    newHtml += "<h4 style=\"color:royalblue;\">Passed reservations:</h4>";
+                                    for (let key in data.Passed) {
+                                        newHtml +=
+                                        "<table class=\"table\">" +
+                                            "<tr style=\"background-color: lightgray;\">" +
+                                                "<td colspan=\"8\" style=\"text-align: center; vertical-align: middle;\"><strong>Accommodations for: " + key + "</strong></td>" +
+                                            "</tr>" +
+                                            "<tr style=\"background-color: #fff4a5;\">" +
+                                                "<th>Name</th>" +
+                                                "<th>Type</th>" +
+                                                "<th>Location</th>" +
+                                                "<th>Stars</th>" +
+                                                "<th>Pool</th>" +
+                                                "<th>Spa</th>" +
+                                                "<th>Dissabled<br>Compatible</th>" +
+                                                "<th>WiFi</th>" +
+                                            "</tr>";
+                                        for (accommodation in data.Passed[key]) {
+                                            newHtml +=
+                                            "<tr style=\"background-color: #DAF7A6;\">" +
+                                                "<td><u>" + data.Passed[key][accommodation].Name + "</u></td>" +
+                                                "<td>" + data.Passed[key][accommodation].Type + "</td>" +
+                                                "<td>" + data.Passed[key][accommodation].Location + "</td>" +
+                                                 "<td>" +(data.Passed[key][accommodation].Type != "Hotel" ? "/" : data.Passed[key][accommodation].Stars) + "</td>" +
+                                                "<td>" + (data.Passed[key][accommodation].Pool == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data.Passed[key][accommodation].Spa == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data.Passed[key][accommodation].DisabledCompatible == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data.Passed[key][accommodation].WiFi == true ? "YES" : "NO") + "</td>" +
+                                            "</tr>";
+
+                                            newHtml += "<tr><th colspan=\"8\" style=\"text-align:center;\">Units</th></tr>";
+                                            newHtml +=
+                                                "<tr>" +
+                                                    "<th colspan=\"3\">Unit Name</th>" +
+                                                    "<th colspan=\"2\">Capacity</th>" +
+                                                    "<th>Pets<br>Allowed</th>" +
+                                                    "<th>Price</th>" +
+                                                    "<th>&nbsp</th>" +
+                                                "</tr>";
+
+                                            for (unit in data.Passed[key][accommodation].Units) {
+
+                                                newHtml +=
+                                                "<tr id=\"row_" + key + "_" + data.Passed[key][accommodation].Name + "_" + (data.Passed[key][accommodation].Units)[unit].UID + "\">" +
+                                                    "<td colspan=\"3\"><b>" + (data.Passed[key][accommodation].Units)[unit].UID + "</b></td>" +
+                                                    "<td colspan=\"2\">" + (data.Passed[key][accommodation].Units)[unit].MaxGuessts + "</td>" +
+                                                    "<td>" + ((data.Passed[key][accommodation].Units)[unit].PetAllowed == true ? "YES" : "NO") + "</td>" +
+                                                    "<td> " + (data.Passed[key][accommodation].Units)[unit].Price + "</td>" +
+                                                "</tr>";
+                                            }
+
+                                            newHtml +=
+                                                "<tr style=\"background-color:#EF7F0F;\">" +
+                                                    "<th colspan=\"8\">Comment</th>" +
+                                                "</tr>" +
+                                                "<tr>" +
+                                                    "<td colspan=\"8\"><textarea class=\"form-control\" style=\"resize:none; min-width:100%;\" rows=\"4\" cols=\"50\" id=\"comment_ta_" + key + "\"></textarea></td>" +
+                                                "</tr>" +
+                                                "<tr>" +
+                                                    "<td colspan=\"7\"><b>1 </b><input type=\"range\" min=\"1\" max=\"5\" id=\"comment_rg_" + key + "\"/><b> 5</b><label style=\"float:left;\" for=\"comment_rg_" + key + "\">Rating:&nbsp&nbsp</label></td>" +
+                                                    "<td><button id=\"btn_comment_" + key +"\">Comment" + "</button></td>" +
+                                                "</tr>";
+                                        }
+                                        newHtml += "</table>";
+                                    }
+                                }
+                                document.getElementById("reservations_table_container_2").innerHTML += newHtml;
+
+                                for (let key in data.Incoming) {
+                                    for (accommodation in data.Incoming[key]) {
+                                        for (unit in data.Incoming[key][accommodation].Units) {
+                                            let element = document.getElementById("btn_reserveCancel_" + key + "_" + data.Incoming[key][accommodation].Name + "_" + (data.Incoming[key][accommodation].Units)[unit].UID);
+                                            if (element != null) { element.addEventListener('click', function () { HandleUnitReservationCancel(element); }); continue; }
+                                        }
+                                    }
+                                }
+
+                                for (let key in data.Passed) {
+                                    for (accommodation in data.Passed[key]) {
+                                        let element = document.getElementById("btn_comment_" + key);
+                                        document.getElementById("btn_comment_" + key).addEventListener('click', function () { HandleArrangementComment(element); });
+                                    }
+                                }
+                            },
+
+                        });
+                    });
+                }
+
+            </script>
+            <div class="col-md-5">
+                <div id="reservations_table_container_1"></div>
+            </div>
+            <div class="col-md-5" style="float:right;">
+                <div id="reservations_table_container_2"></div>
+            </div> 
+        </div>
+    </div>
+    
+</body>
+
+</html>

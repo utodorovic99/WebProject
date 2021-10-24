@@ -1,0 +1,71 @@
+﻿body {
+    padding-top: 3%;
+    padding-bottom: 3%;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+#navBar
+{
+    font-size: large;
+    font-family: Arial;
+    color:royalblue;
+}
+
+#navBar>ul>li
+{
+   list-style-type: none; 
+   display:inline;
+   padding-right: 5%;
+}
+
+@keyframes impTxtShake
+{
+      0% { transform: skewX(-15deg); }
+      5% { transform: skewX(15deg); }
+      10% { transform: skewX(-15deg); }
+      15% { transform: skewX(15deg); }
+      20% { transform: skewX(0deg); }
+      100% { transform: skewX(0deg); }
+}
+
+.impTxt
+{
+    font-size:large;
+    color:indianred;
+    font-family:Arial;
+    font-weight:bold;
+    text-align:center;
+    animation-name: impTxtShake;
+    animation-duration:3s;
+    animation-delay:3s;
+    animation-iteration-count:infinite;
+}
+
+[id^=details]
+{
+    background-color:white;
+    width:inherit;
+}
+
+[id^=details]>img
+{
+    max-width:inherit;
+    width: 100%;
+    height: auto;
+}
+
+li {
+  margin-bottom: 13px;
+}

@@ -1,0 +1,671 @@
+﻿<html>
+
+<head>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+    <script type="text/javascript" src="~/Scripts/LoginRegister.js"></script>
+
+    <link rel="stylesheet" href="~/Content/Site.css" />
+    <link rel="stylesheet" href="~/Content/LoginRegister.css" />
+    <link rel="stylesheet" href="~/Content/NavBar.css" />
+    <link rel="stylesheet" href="~/Content/v6.6.1-dist/ol.css" type="text/css" />
+    <style>
+        .map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+    <script type="text/javascript" src="~/Content/v6.6.1-dist/ol.js"></script>  
+
+</head>
+
+<body style="background-image:url(../../Content/Images/summer.jpg); background-attachment:fixed; ">
+    
+    <div class="container-fluid">
+
+        <nav class="navbar navbar-default">
+            <div class="container">
+
+                <div class="navbar-header">
+                    <a style="cursor:pointer;" onko class="navbar-brand" onclick='return TriggerBack()'>Back</a>
+                    <script>
+                        function TriggerBack() {
+                            $(document).ready(function () {
+                                if (history.length > 2)
+                                    history.back();
+                                else
+                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                            });
+                        }
+                    </script>
+                </div>
+            </div>
+        </nav>
+     </div>
+
+    <div class="container">
+        <div class="row">
+
+            <script type="text/javascript">
+                var loadedArrangements;
+                var filteredArrangements;
+
+                function PrintArrangements(data) {
+                    if (data.length == 0) {
+                        console.log("Nothing to offer");
+                        $('#arrangements_table_container').html("<p class=\"impTxt\">Unfortunately, all arrangements are reserved.<br/> Visit us later or check previous ones. </p>");
+                        return;
+                    }
+
+                    // TABELA ARANZMANA
+                    let arrangements = new String("<table class=\"table\" id=\"arrangements_table\">");
+                    // RED SA OSNOVNIM INFORMACIJAMA (NASLOVAN LINIJA TABELE)
+                    arrangements +=
+                        "<tr>" +
+                            "<th>Name</th>" +
+                            "<th>From</th>" +
+                            "<th>Till</th>" +
+                            "<th>Total days</th>" +
+                            "<th>Price from:</th>" +
+                            "<th>&nbsp</th>" +
+                        "</tr>";
+
+
+                    for (arrangement in data) {
+                        // RED SA OSNOVNIM INFORMACIJAMA (PODACI)
+                        arrangements +=
+                        "<tr id=" + "\"btn_" + data[arrangement].Name + "\"" + " onclick=\"HandleTableClick(this)\"" + " style=\"cursor:pointer;\">" +
+                            "<td style=\"border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + data[arrangement].Name + "</td>" +
+                            "<td style=\"border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + data[arrangement].DateStart + "</td>" +
+                            "<td style=\"border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + data[arrangement].DateStop + "</td>" +
+                            "<td style=\"border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + data[arrangement].Days + "</td>" +
+                            "<td style=\"border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + data[arrangement].MinPrice + "</td>" +
+                            "<td style=\"border-top: 2px solid #86F438; border-bottom: 2px solid #86F438;\">" + "<img src=\"" + data[arrangement].PosterURL + "\" style=\"width:35%; height:35%; border-radius:50%; \"/>" + "</td>" +
+                        "</tr>";
+                    }
+                    arrangements += "</table>";
+                    detailsTriggered = false;
+                    $(document).ready(function () { $('#arrangements_table_container').html(arrangements); });
+                }
+
+                $(document).load()
+                {
+                    $.getJSON
+                    ("/api/arrangements/history_ongoing",
+                    function (data, status) {
+                        loadedArrangements = data;
+                        filteredArrangements = data;
+                        PrintArrangements(loadedArrangements);       
+                    }
+                    );
+                }
+
+                var commentsCopy;
+                function RenderComments(elem)
+                {
+                    $.getJSON
+                        ("/api/arrangements/getComments/" + elem.id.substring(4),
+                        function (data, status) {
+                            commentsCopy = $.extend(true, {}, data);
+                            newHtml = "<ul>";
+                            for (comment in data) {
+                                newHtml += "<li>" + data[comment].UID + " commented" +
+                                            " rating it with " + data[comment].Rating + " stars:<br>" +
+                                                "<i>" + data[comment].Txt + "</i></li>";
+                            }
+                            newHtml += "</ul>";
+                            document.getElementById("comments_" + elem.id.substring(4)).innerHTML += newHtml
+                        });
+                }
+
+                function HandleCommentApprove(elem)
+                {
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/arrangements/managerCommentApprove",
+                        data: JSON.stringify(commentsCopy[elem.id.split('_')[3]]),
+                        contentType: "application/json",
+                        dataType: "text",
+                        headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                        success: function (data, status) {
+                            document.getElementById("comments_" + elem.id.split('_')[2]).innerHTML = "";
+                            HandleCommentsRender(document.getElementById("btn_" + elem.id.split('_')[2]));
+                        },
+                        error: function (jqXhr, textStatus, errorMessage) {
+                            alert("Comment approve failed with error: " + jqXhr.responseText);
+                        }
+
+                    });
+                }
+
+                function HandleCommentDecline(elem)
+                {
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/arrangements/managerCommentDecline",
+                        data: JSON.stringify(commentsCopy[elem.id.split('_')[3]]),
+                        contentType: "application/json",
+                        dataType: "text",
+                        headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                        success: function (data, status) {
+                            document.getElementById("comments_" + elem.id.split('_')[2]).innerHTML = "";
+                            HandleCommentsRender(document.getElementById("btn_" + elem.id.split('_')[2]));
+                        },
+                        error: function (jqXhr, textStatus, errorMessage) {
+                            alert("Comment approve failed with error: " + jqXhr.responseText);
+                        }
+
+                    });
+                }
+
+                function RenderCommentsManagerRegime(elem)
+                {
+
+                    $.ajax({
+                        type: "GET",
+                        url: "/api/arrangements/getCommentsForManager/" + elem.id.substring(4),
+                        headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                        success: function (data, status) {
+                            commentsCopy = $.extend(true, {}, data);
+                            let approved = "";
+                            let pending = "";
+                            let declined = "";
+
+                            for (comment in data) {
+
+                                if (data[comment].Status == 'ap') {
+                                    approved += "<li><strong style=\"color:green;\">[APPROVED] </strong>" + data[comment].UID + " commented" +
+                                                " rating it with " + data[comment].Rating + " stars:<br>" +
+                                                    "<i>" + data[comment].Txt + "</i><br><br>" +
+                                                    "<div style=\"text-align:center;\">" +
+                                                        "<button onclick=\"HandleCommentDecline(this)\" id=\"btn_approve_" + elem.id.substring(4) + "_" + comment + "\" style=\"color:#CD5C5C;\">Decline</button>" +
+                                                    "</div>" +
+                                                "</li>";;
+                                }
+                                else if (data[comment].Status == 'pd') {
+                                    pending += "<li><strong style=\"color:#4169e1;\">[PENDING] </strong>" + data[comment].UID + " commented" +
+                                                " rating it with " + data[comment].Rating + " stars:<br>" +
+                                                    "<i>" + data[comment].Txt + "</i><br><br>" +
+                                                    "<div style=\"text-align:center;\">" +
+                                                        "<button onclick=\"HandleCommentApprove(this)\" id=\"btn_approve_" + elem.id.substring(4) + "_" + comment + "\" style=\"color:green;\">Approve</button> &nbsp" +
+                                                        "<button onclick=\"HandleCommentDecline(this)\" id=\"btn_approve_" + elem.id.substring(4) + "_" + comment + "\" style=\"color:#CD5C5C;\">Decline</button>" +
+                                                    "</div>" +
+                                                "</li>";
+                                }
+                                else if (data[comment].Status == 'dc') {
+                                    declined += "<li><strong style=\"color:#CD5C5C;\">[DECLINED] </strong>" + data[comment].UID + " commented" +
+                                                " rating it with " + data[comment].Rating + " stars:<br>" +
+                                                    "<i>" + data[comment].Txt + "</i><br><br>" +
+                                                    "<div style=\"text-align:center;\">" +
+                                                        "<button onclick=\"HandleCommentApprove(this)\" id=\"btn_approve_" + elem.id.substring(4) + "_" + comment + "\"  style=\"color:green;\">Approve</button> &nbsp" +
+                                                    "</div>" +
+                                                "</li>";
+                                }
+                            }
+                            document.getElementById("comments_" + elem.id.substring(4)).innerHTML += ("<ul>" + approved + pending + declined + "</ul>");
+                        },
+                        error: function (jqXhr, textStatus, errorMessage) {
+                            alert("Detecting arrangement crator failed with: " + jqXhr.responseText);
+                            RenderComments(elem); // Render approved anyway
+                        }
+
+                    });
+                }
+
+                function HandleCommentsRender(elem)
+                {
+                    if (window.localStorage.getItem('Role') == 'Manager') {
+                        $.ajax({
+                            type: "GET",
+                            url: "/api/arrangements/isCreatedByManager/" + elem.id.substring(4),
+                            headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                            success: function (data, status) {
+                                if (data)
+                                    RenderCommentsManagerRegime(elem);
+                                else
+                                    RenderComments(elem);
+                            },
+                            error: function (jqXhr, textStatus, errorMessage) {
+                                alert("Detecting arrangement crator failed with: " + jqXhr.responseText);
+                                RenderComments(elem); // Render approved anyway
+                            }
+
+                        });
+                    }
+                    else
+                        RenderComments(elem);
+                }
+
+                var detailsToShow;
+                var detailsTriggered;
+                function HandleTableClick(elem) {
+                    $(document).ready(function () {
+                        if (detailsTriggered == true && detailsToShow == elem.id) {
+                            document.getElementById("th_details_" + detailsToShow.substring(4)).remove();
+                            document.getElementById("div_comments_" + detailsToShow.substring(4)).remove();
+                            detailsTriggered = false;
+                            return;
+                        }
+                        if (detailsTriggered == true && detailsToShow != elem.id)
+                        {
+                            document.getElementById("th_details_" + detailsToShow.substring(4)).remove();
+                            document.getElementById("div_comments_" + detailsToShow.substring(4)).remove();
+                        }
+
+                        $.getJSON
+                        ("/api/arrangements/" + elem.id.substring(4),
+                            function (data, status) {
+                                let newHtml = new String();
+                                newHtml +=
+                                    "<th colspan=\"4\" id=\"th_details_" + elem.id.substring(4) + "\">" +
+                                        "<div id=\"details_" + elem.id.substring(4) + "\">" +
+                                            "<h3>" + elem.id.substring(4) + "</h3>" +
+                                            "<img src=\"" + data.PosterURL + "\"/>" + "<br/>" +
+                                            "<p> Location: " + data.Locationn + "</p>" +
+                                            "<p> Type: " + data.Type + "</p>" +
+                                            "<p> Starts: " + data.DateStart + "</p>" +
+                                            "<p> Ends: " + data.DateStop + "</p>" +
+                                            "<p> Max. Passengers:" + data.MaxPassengers + "</p>" +
+                                            "<h4>Program:</h4>" +
+                                            "<p> " + data.Program + "</p>" +
+                                            "<h4>Description:</h4>" +
+                                            "<p>" + data.Desc + "</p>" +
+                                            "<p> Transport: " + data.Transport + "</p>" +
+                                            "<p> Meeting time:" + data.MeetingTime + "</p>" +
+                                            "<p> Meeting spot: " + data.MeetingSpot.Address + "</p>" +
+                                            "<div id=\"map\" class=\"map\"></div>" +
+                                        "</div>" +
+                                    "</th>"+
+                                    "<th id=\"div_comments_" + elem.id.substring(4) + "\" colspan=\"2\">" +
+                                        "<h4 >Comments</h4>" +
+                                        "<div id=\"comments_" + elem.id.substring(4) + "\">" +
+                                        "</div>"+
+                                    "</th>";
+
+                                detailsToShow = elem.id;
+                                detailsTriggered = true;
+                                document.getElementById(detailsToShow).outerHTML += newHtml;
+
+                                HandleCommentsRender(elem);
+
+                                var map = new ol.Map(
+                                    {
+                                        target: 'map',
+                                        layers: [new ol.layer.Tile({ source: new ol.source.OSM() })],
+                                        view: new ol.View(
+                                            {
+                                                center: ol.proj.fromLonLat([data.MeetingSpot.GeoLongitude, data.MeetingSpot.GeoLatitude]),
+                                                zoom: 15
+                                            })
+                                    });
+
+                                var layer = new ol.layer.Vector({
+                                    source: new ol.source.Vector({
+                                        features: [
+                                            new ol.Feature({
+                                                geometry: new ol.geom.Point(ol.proj.fromLonLat([data.MeetingSpot.GeoLongitude, data.MeetingSpot.GeoLatitude]))
+                                            })
+                                        ]
+                                    })
+                                });
+                                map.addLayer(layer);
+                            }
+                         );
+                    });
+                }
+
+            </script>
+            <div class="col-lg-9">
+                <div id="arrangements_search">
+
+                    <table class="table" style="border:medium solid gray;">
+                        <caption class="caption" style="padding:10px 10px 10px 10px; font-size:large; padding-bottom:3%; font-family:Arial; font-weight:bold; color:royalblue; float:left;">Arrangements Search</caption>
+                        <tr style="background-color:lightgray;">
+                            <th colspan="2">Start dates</th>
+                            <th colspan="2">Ending dates</th>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <input type="date" name="search_from_min" id="search_from_min" tabindex="1" placeholder="dd-mm-yyyy" value="">
+                                <label for="search_from_min" style="display:inline-block; float:left;">Min:</label>
+                            </td>
+
+                            <td>
+                                <input type="date" name="search_from_max" id="search_from_max" tabindex="1" placeholder="dd-mm-yyyy" value="">
+                                <label for="search_from_max" style="display:inline-block; float:left; ">Max:</label>
+                            </td>
+
+                            <td>
+                                <input type="date" name="search_till_min" id="search_till_min" tabindex="1" placeholder="dd-mm-yyyy" value="">
+                                <label for="search_till_min" style="display:inline-block; float:left; ">Min:</label>
+                            </td>
+
+                            <td>
+                                <input type="date" name="search_till_max" id="search_till_max" tabindex="1" placeholder="dd-mm-yyyy" value="">
+                                <label for="search_till_max" style="display:inline-block; float:left; ">Max:</label>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th colspan="2">
+                                <select name="search_transport" id="search_transport">
+                                    <option value="airplane">Airplane</option>
+                                    <option value="ship">Ship</option>
+                                    <option value="boat">Boat</option>
+                                    <option value="train">Train</option>
+                                    <option value="bus">Bus</option>
+                                    <option value="minivan">Minivan</option>
+                                    <option value="car">Car</option>
+                                    <option value="combined">Combined</option>
+                                    <option value="any" selected="selected">Any</option>
+                                </select>
+                                <label for="search_transport" style="display:inline-block; float:left; ">Transport type:</label>
+                            </th>
+
+                            <th colspan="2">
+                                <select name="search_type" id="search_type">
+                                    <option value="EP">European Plan (EP)</option>
+                                    <option value="B&B">Bed &amp; Breakfast (B&amp;B)</option>
+                                    <option value="DP">Demi Pansion (DP)</option>
+                                    <option value="FP">Full Pansion (FP)</option>
+                                    <option value="any" selected="selected">Any</option>
+                                </select>
+                                <label for="search_type" style="display:inline-block; float:left; ">Arrangement type:</label>
+                            </th>
+
+                        </tr>
+
+                        <tr>
+                            <th colspan="2">
+                                <input id="search_name" name="search_name" type="search" placeholder="Name" />
+                                <label for="search_name" style="display:inline-block; float:left; ">Arrangement name:</label>
+                            </th>
+
+                            <th colspan="2">
+                                <input style="float:left; width:30%;" type="button" name="search_search" id="search_search" class="form-control btn btn-register" value="Search" />&nbsp;&nbsp;
+                                <input style="width:30%;" type="button" name="search_reload" id="search_reload" class="form-control btn btn-login" value="Refresh" />
+
+                            </th>
+                        </tr>
+
+                        <tr style="background-color:lightgrey;">
+                            <th style="text-align:right;"><strong>Sort: </strong></th>
+                            <th><input style="font-size:12px; padding: 4px 0;" type="button" name="sort_name_asc" id="sort_name_asc" value="Name Asc" class="form-control btn btn-login" /></th>
+                            <th><input style="font-size:12px; padding: 4px 0;" type="button" name="sort_datestart_asc" id="sort_datestart_asc" value="Date Start Asc" class="form-control btn btn-login" /></th>
+                            <th><input style="font-size:12px; padding: 4px 0;" type="button" name="sort_datestop_asc" id="sort_datestop_asc" value="Date Stop Asc" class="form-control btn btn-login" /></th>
+                        </tr>
+
+                        <tr style="background-color:lightgrey;">
+                            <th>&nbsp;</th>
+                            <th><input style="font-size:12px; padding: 4px 0; background-color: #1CB94E;" type="button" name="sort_name_desc" id="sort_name_desc" value="Name Desc" class="form-control btn btn-login" /></th>
+                            <th><input style="font-size:12px; padding: 4px 0; background-color: #1CB94E;" type="button" name="sort_datestart_desc" id="sort_datestart_desc" value="Date Start Desc" class="form-control btn btn-login" /></th>
+                            <th><input style="font-size:12px; padding: 4px 0; background-color: #1CB94E;" type="button" name="sort_datestop_desc" id="sort_datestop_desc" value="Date Stop Desc" class="form-control btn btn-login" /></th>
+                        </tr>
+
+                    </table>
+                    <script>
+                        function FilterBySearch() {
+                            let dateStartMin, dateStopMin, dateStartMax, dateStopMax, transport, type, name;
+                            $(document).ready(function () {
+                                let tmpCopy = $.extend(true, {}, loadedArrangements); // Deep copy
+
+                                dateStartMin = $("#search_from_min").val();
+                                dateStopMin = $("#search_till_min").val();
+                                dateStartMax = $("#search_from_max").val();
+                                dateStopMax = $("#search_till_max").val();
+                                transport = $("#search_transport").val();
+                                type = $("#search_type").val();
+                                name = $("#search_name").val();
+
+                                let errStr = "";
+                                let toRemIDXes = [];
+                                if (dateStartMin != "") {
+                                    if (IsValidDate(dateStartMin)) {
+                                        for (arrangement in tmpCopy)
+                                            if (CheckTimeRelation(PresentationToISODateTime(tmpCopy[arrangement].DateStart), dateStartMin) < 0) toRemIDXes.push(arrangement);
+
+                                        for (idx in toRemIDXes) delete (tmpCopy[toRemIDXes[idx]]);
+                                    }
+                                    else { errStr += "Invalid Minimal Date Start\n "; }
+                                }
+
+                                toRemIDXes = [];
+                                if (dateStopMin != "") {
+                                    if (IsValidDate(dateStopMin)) {
+                                        for (arrangement in tmpCopy)
+                                            if (CheckTimeRelation(PresentationToISODateTime(tmpCopy[arrangement].DateStop), dateStopMin) < 0) toRemIDXes.push(arrangement);
+
+                                        for (idx in toRemIDXes) delete (tmpCopy[toRemIDXes[idx]]);
+                                    }
+                                    else { errStr += "Invalid Minimal Date Stop\n"; }
+                                }
+
+                                toRemIDXes = [];
+                                if (dateStartMax != "") {
+                                    if (IsValidDate(dateStartMax)) {
+                                        for (arrangement in tmpCopy)
+                                            if (CheckTimeRelation(PresentationToISODateTime(tmpCopy[arrangement].DateStart, dateStartMax)) > 0) toRemIDXes.push(arrangement);
+
+                                        for (idx in toRemIDXes) delete (tmpCopy[toRemIDXes[idx]]);
+                                    }
+                                    else { errStr += "Invalid Maximal Date Start\n"; }
+                                }
+
+                                toRemIDXes = [];
+                                if (dateStopMax != "") {
+                                    if (IsValidDate(dateStopMax)) {
+                                        for (arrangement in tmpCopy)
+                                            if (CheckTimeRelation(PresentationToISODateTime(tmpCopy[arrangement].DateStop), dateStopMax) > 0) toRemIDXes.push(arrangement);
+
+                                        for (idx in toRemIDXes) delete (tmpCopy[toRemIDXes[idx]]);
+                                    }
+                                    else { errStr += "Invalid Maximal Date Stop\n"; }
+                                }
+
+                                if (name != "") {
+                                    toRemIDXes = [];
+                                    for (arrangement in tmpCopy)
+                                        if (!tmpCopy[arrangement].Name.includes(name)) toRemIDXes.push(arrangement);
+
+                                    for (idx in toRemIDXes) delete (tmpCopy[toRemIDXes[idx]]);
+                                }
+
+                                if (type != "any") {
+                                    toRemIDXes = [];
+                                    for (arrangement in tmpCopy)
+                                        if (!tmpCopy[arrangement].Type.toLowerCase().includes(type.toLowerCase())) toRemIDXes.push(arrangement);
+
+                                    for (idx in toRemIDXes) delete (tmpCopy[toRemIDXes[idx]]);
+                                }
+
+                                if (transport != "any") {
+                                    toRemIDXes = [];
+                                    for (arrangement in tmpCopy) {
+                                        if (transport == "combined" && !tmpCopy[arrangement].Transport.toLowerCase().includes(transport)) toRemIDXes.push(arrangement);
+                                        else if (transport != "combined" && tmpCopy[arrangement].Transport.toLowerCase() != transport) toRemIDXes.push(arrangement);
+
+                                    }
+                                    for (idx in toRemIDXes) delete (tmpCopy[toRemIDXes[idx]]);
+                                }
+                                if (errStr != "") alert("Bad search params excluded from filter:\n" + errStr);
+                                filteredArrangements = tmpCopy;
+                                PrintArrangements(tmpCopy);
+                            });
+
+                        }
+
+                        function HandleSearchReload() {
+                        $("#search_from_min").val("");
+                        $("#search_from_max").val("");
+                        $("#search_till_min").val("");
+                        $("#search_till_max").val("");
+
+                        $("#search_from_min").val("");
+                        $("#search_from_max").val("");
+                        $("#search_till_min").val("");
+                        $("#search_till_max").val("");
+
+                        $("#search_transport").prop("selectedIndex", 8);
+                        $("#search_type").prop("selectedIndex", 4);
+                        $("#search_name").val("");
+                        filteredArrangements = loadedArrangements;
+                        PrintArrangements(loadedArrangements);
+
+                    }
+
+                        function HandleSortNameAsc()
+                        {
+                            let minimum;
+                            for (let swLoc = 0; swLoc < filteredArrangements.length-1; ++swLoc)
+                            {
+                                minimum = swLoc;
+                                for (let toCompare = swLoc + 1; toCompare < filteredArrangements.length; ++toCompare)
+                                {
+                                    if (filteredArrangements[toCompare].Name < filteredArrangements[minimum].Name)
+                                        minimum = toCompare;
+                                }
+                                if (swLoc != minimum)
+                                {
+                                    filteredArrangements.push(filteredArrangements[swLoc]);     // Lokaciju koju popunjavam trenutnu vrijednost smjestim na kraj
+                                    filteredArrangements[swLoc]=filteredArrangements[minimum];  // Minimum ubacim gdje treba
+                                    filteredArrangements.splice(minimum,1);                       // Obrisem staru lokaciju minimuma
+
+                                }
+                            }
+                            PrintArrangements(filteredArrangements);
+                        };
+
+                        function HandleSortNameDesc()
+                        {
+                            let minimum;
+                            for (let swLoc = 0; swLoc < filteredArrangements.length-1; ++swLoc)
+                            {
+                                minimum = swLoc;
+                                for (let toCompare = swLoc + 1; toCompare < filteredArrangements.length; ++toCompare)
+                                {
+                                    if (filteredArrangements[toCompare].Name > filteredArrangements[minimum].Name)
+                                        minimum = toCompare;
+                                }
+                                if (swLoc != minimum)
+                                {
+                                    filteredArrangements.push(filteredArrangements[swLoc]);     // Lokaciju koju popunjavam trenutnu vrijednost smjestim na kraj
+                                    filteredArrangements[swLoc]=filteredArrangements[minimum];  // Minimum ubacim gdje treba
+                                    filteredArrangements.splice(minimum,1);                       // Obrisem staru lokaciju minimuma
+
+                                }
+                            }
+                            PrintArrangements(filteredArrangements);
+                        };
+
+                        function HandleSortDateStartAsc()
+                        {
+                            let minimum;
+                            for (let swLoc = 0; swLoc < filteredArrangements.length-1; ++swLoc)
+                            {
+                                minimum = swLoc;
+                                for (let toCompare = swLoc + 1; toCompare < filteredArrangements.length; ++toCompare)
+                                {
+                                    if (CheckTimeRelation(PresentationToISODateTime(filteredArrangements[toCompare].DateStart), PresentationToISODateTime(filteredArrangements[minimum].DateStart)) < 0)
+                                        minimum = toCompare;
+                                }
+                                if (swLoc != minimum)
+                                {
+                                    filteredArrangements.push(filteredArrangements[swLoc]);     // Lokaciju koju popunjavam trenutnu vrijednost smjestim na kraj
+                                    filteredArrangements[swLoc]=filteredArrangements[minimum];  // Minimum ubacim gdje treba
+                                    filteredArrangements.splice(minimum,1);                       // Obrisem staru lokaciju minimuma
+
+                                }
+                            }
+                            PrintArrangements(filteredArrangements);
+                        };
+
+                        function HandleSortDateStartDesc()
+                        {
+                            let minimum;
+                            for (let swLoc = 0; swLoc < filteredArrangements.length - 1; ++swLoc)
+                            {
+                                minimum = swLoc;
+                                for (let toCompare = swLoc + 1; toCompare < filteredArrangements.length; ++toCompare)
+                                {
+                                    if (CheckTimeRelation(PresentationToISODateTime(filteredArrangements[toCompare].DateStart), PresentationToISODateTime(filteredArrangements[minimum].DateStart)) > 0)
+                                        minimum = toCompare;
+                                }
+                                if (swLoc != minimum)
+                                {
+                                    filteredArrangements.push(filteredArrangements[swLoc]);     // Lokaciju koju popunjavam trenutnu vrijednost smjestim na kraj
+                                    filteredArrangements[swLoc]=filteredArrangements[minimum];  // Minimum ubacim gdje treba
+                                    filteredArrangements.splice(minimum,1);                       // Obrisem staru lokaciju minimuma
+                                }
+                            }
+                            PrintArrangements(filteredArrangements);
+                        };
+
+                        function HandleSortDateStopAsc()
+                        {
+                            let minimum;
+                            for (let swLoc = 0; swLoc < filteredArrangements.length-1; ++swLoc)
+                            {
+                                minimum = swLoc;
+                                for (let toCompare = swLoc + 1; toCompare < filteredArrangements.length; ++toCompare)
+                                {
+                                    if (CheckTimeRelation(PresentationToISODateTime(filteredArrangements[toCompare].DateStop), PresentationToISODateTime(filteredArrangements[minimum].DateStop)) < 0)
+                                        minimum = toCompare;
+                                }
+                                if (swLoc != minimum)
+                                {
+                                    filteredArrangements.push(filteredArrangements[swLoc]);     // Lokaciju koju popunjavam trenutnu vrijednost smjestim na kraj
+                                    filteredArrangements[swLoc]=filteredArrangements[minimum];  // Minimum ubacim gdje treba
+                                    filteredArrangements.splice(minimum,1);                       // Obrisem staru lokaciju minimuma
+
+                                }
+                            }
+                            PrintArrangements(filteredArrangements);
+                        };
+
+                        function HandleSortDateStopDesc()
+                        {
+                            let minimum;
+                            for (let swLoc = 0; swLoc < filteredArrangements.length - 1; ++swLoc)
+                            {
+                                minimum = swLoc;
+                                for (let toCompare = swLoc + 1; toCompare < filteredArrangements.length; ++toCompare)
+                                {
+                                    if (CheckTimeRelation(PresentationToISODateTime(filteredArrangements[toCompare].DateStop), PresentationToISODateTime(filteredArrangements[minimum].DateStop)) > 0)
+                                        minimum = toCompare;
+                                }
+                                if (swLoc != minimum)
+                                {
+                                    filteredArrangements.push(filteredArrangements[swLoc]);     // Lokaciju koju popunjavam trenutnu vrijednost smjestim na kraj
+                                    filteredArrangements[swLoc]=filteredArrangements[minimum];  // Minimum ubacim gdje treba
+                                    filteredArrangements.splice(minimum,1);                       // Obrisem staru lokaciju minimuma
+                                }
+                            }
+                            PrintArrangements(filteredArrangements);
+                        };
+
+                        $(document).ready(function () {
+                                $('#search_search').on('click', FilterBySearch);
+                                $('#search_reload').on('click', HandleSearchReload);
+
+                                $('#sort_name_asc').on      ('click', HandleSortNameAsc);
+                                $('#sort_name_desc').on     ('click', HandleSortNameDesc);
+                                $('#sort_datestart_asc').on ('click', HandleSortDateStartAsc);
+                                $('#sort_datestart_desc').on('click', HandleSortDateStartDesc);
+                                $('#sort_datestop_asc').on  ('click', HandleSortDateStopAsc);
+                                $('#sort_datestop_desc').on ('click', HandleSortDateStopDesc);
+                            });
+                    </script>
+
+                </div>
+                <div id="arrangements_table_container"></div>
+
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
+

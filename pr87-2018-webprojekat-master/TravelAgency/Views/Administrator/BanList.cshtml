@@ -1,0 +1,107 @@
+﻿<html>
+
+<head>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+    <script type="text/javascript" src="~/Scripts/LoginRegister.js"></script>
+
+    <link rel="stylesheet" href="~/Content/Site.css" />
+    <link rel="stylesheet" href="~/Content/LoginRegister.css" />
+    <link rel="stylesheet" href="~/Content/NavBar.css" />
+    <link rel="stylesheet" href="~/Content/v6.6.1-dist/ol.css" type="text/css" />
+    <style>
+        .map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+    <script type="text/javascript" src="~/Content/v6.6.1-dist/ol.js"></script>
+
+</head>
+
+<body style="background-image:url(../../Content/Images/summer.jpg); background-attachment:fixed; ">
+
+    <div class="container-fluid">
+
+        <nav class="navbar navbar-default">
+            <div class="container">
+
+                <div class="navbar-header">
+                    <a style="cursor:pointer;" onko class="navbar-brand" onclick='return TriggerBack()'>Back</a>
+                    <script>
+                        function TriggerBack() {
+                            $(document).ready(function () {
+                                if (history.length > 2)
+                                    history.back();
+                                else
+                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                            });
+                        }
+                    </script>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div id="login_reg_row" class="col-md-3 col-md-offset-0">
+        <div class="panel panel-login" style="width:350%;">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h3 id="formTitle">Ban List</h3>  
+                        <div id="usersDiv"></div>    
+                        <script>   
+                            
+                            function BanUser(elem)
+                            {
+                                let parts = elem.id.split("_");
+                                $.ajax({
+                                    type: "PUT",
+                                    url: "/api/admin/ban/" + parts[1],
+                                    headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                    success: function (data, status) {
+                                        alert("success");
+                                        document.getElementById(elem.id).remove();
+                                        document.getElementById(elem.id+"_name").remove();
+                                    },
+                                    error: function (jqXhr, textStatus, errorMessage) {
+                                        alert("Ban failed with error " + jqXhr.responseText);
+                                    }
+                                });
+                            }
+
+                            $(document).ready(function () {
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/api/admin/getToBan",
+                                    headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                    success: function (data, status) {
+                                        let newHtml = "<table class=\"table\">" +
+                                                        "<tr>" +
+                                                               "<th>Username</th>" +
+                                                               "<th>Ban</th>" +
+                                                        "</tr>";
+                                        for (user in data) {
+                                            newHtml += "<tr>" +
+                                                            "<td id=\"btnBan_" + data[user] + "_name\"><b>" + data[user] + "</b></td>" +
+                                                            "<td><button id=\"btnBan_" + data[user] + "\" onclick=\"BanUser(this)\">Ban</button></td>" +
+                                                        "</tr>";
+                                        }
+
+                                        newHtml += "</table>";
+                                        document.getElementById("usersDiv").innerHTML = newHtml;
+                                    },
+                                    error: function (jqXhr, textStatus, errorMessage) {
+                                        alert("Error loading ToBan list: " + jqXhr.responseText);
+                                    }
+                                });
+                            });
+
+                        </script>    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

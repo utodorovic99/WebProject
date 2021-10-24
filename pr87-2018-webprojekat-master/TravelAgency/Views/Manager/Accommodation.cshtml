@@ -1,0 +1,504 @@
+﻿<html>
+
+<head>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+    <script type="text/javascript" src="~/Scripts/LoginRegister.js"></script>
+
+    <link rel="stylesheet" href="~/Content/Site.css" />
+    <link rel="stylesheet" href="~/Content/LoginRegister.css" />
+    <link rel="stylesheet" href="~/Content/NavBar.css" />
+    <link rel="stylesheet" href="~/Content/v6.6.1-dist/ol.css" type="text/css" />
+    <style>
+        .map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+    <script type="text/javascript" src="~/Content/v6.6.1-dist/ol.js"></script>
+
+</head>
+
+<body style="background-image:url(../../Content/Images/summer.jpg); background-attachment:fixed; ">
+
+    <div class="container-fluid">
+
+        <nav class="navbar navbar-default">
+            <div class="container">
+
+                <div class="navbar-header">
+                    <a style="cursor:pointer;" onko class="navbar-brand" onclick='return TriggerBack()'>Back</a>
+                    <script>
+                        function TriggerBack() {
+                            $(document).ready(function () {
+                                if (history.length > 2)
+                                    history.back();
+                                else
+                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home";
+                            });
+                        }
+                    </script>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div id="login_reg_row" class="col-md-3 col-md-offset-0">
+        <div class="panel panel-login" style="width:350%;">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h3 id="formTitle">Create accommodation</h3>
+                        <form id="register-form" action="" method="post" role="form">
+                            <table>
+                                <tr>
+                                    <td style="padding-right:3%;">
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="nameForm">Name: </label>
+                                            <input type="text" name="nameForm" id="nameForm" tabindex="1" class="form-control" placeholder="Name" value="" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                    <td style="padding-right:3%;">
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="locationForm">Location: </label>
+                                            <input type="text" name="locationForm" id="locationForm" tabindex="1" class="form-control" placeholder="Location" value="" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                    <td style="padding-right:3%;">
+                                        <div class="form-group" style="padding-right:30%;">
+                                            <label style="font:x-large; color:royalblue;" for="new_type">Type:</label>
+                                            <select name="new_type" id="new_type" tabindex="1" onchange="UpdateSliderStatus(this.value)">
+                                                <option value="Hotel">Hotel</option>
+                                                <option value="Motel">Motel</option>
+                                                <option value="Villa">Villa</option>
+                                            </select>
+                                        </div>
+                                    </td>
+
+                                    <td style="padding-right:3%;">
+                                        <div class="form-group" id="sliderDiv">
+                                            <label id="sliderLabel" style="font:x-large; color:royalblue; float:left;" for="starsForm">Stars: </label>
+                                            <input type="range" name="starsForm" id="starsForm" onchange="updateVal(this.value)" class="form-control" value="5" min="1" max="5" ; padding-left:50%;">
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+
+                                    <td style="padding-right:3%;">
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="poolForm">Pool: </label>
+                                            <input type="checkbox" name="poolForm" id="poolForm" tabindex="1" class="form-control" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                    <td style="padding-right:3%;">
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="spaForm">Spa: </label>
+                                            <input type="checkbox" name="spaForm" id="spaForm" tabindex="1" class="form-control" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                    <td style="padding-right:3%;">
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="wifiForm">WiFi: </label>
+                                            <input type="checkbox" name="wifiForm" id="wifiForm" tabindex="1" class="form-control" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                    <td style="padding-right:3%;">
+                                        <div class="form-group">
+                                            <label style="font:x-large; color:royalblue;" for="disscplForm">Dissabled compatible: </label>
+                                            <input type="checkbox" name="disscplForm" id="disscplForm" tabindex="1" class="form-control" style="width:100%">
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+
+                                    <td colspan="3" align="center">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-sm-6 col-sm-offset-3">
+                                                    <input onclick="HandleSubmitClick()" type="button" name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Submit" style="align-self:center;">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                            </table>
+
+                            <br /><hr /><br />
+
+                            <script>
+
+                                function updateVal(currVal) {
+                                    document.getElementById('sliderLabel').innerHTML = "Stars: " + currVal;
+                                }
+
+                                $(document).ready(function () {
+                                    document.getElementById('sliderLabel').innerHTML = "Stars: " + document.getElementById('starsForm').value;
+                                    let parts = window.localStorage.getItem("targetData").split('_');
+                                    if (window.localStorage.getItem('operation') == 'm') {
+                                       
+                                        $.ajax({
+                                            type: "GET",
+                                            url: "/api/accommodations/getSingle/" + parts[2] + "/" + parts[3],
+                                            contentType: "application/json",
+                                            dataType: "text",
+                                            success: function (data, status) {
+                                                data = JSON.parse(data);
+                                                $("#nameForm").val(data.Name);
+                                                $("#locationForm").val(data.Location);
+                                                $("#new_type").val(data.Type);
+                                                if (data.Type == "Hotel") $("#starsForm").val(data.Stars);
+                                                document.getElementById("poolForm").checked = data.Pool;
+                                                document.getElementById("spaForm").checked = data.Spa;
+                                                document.getElementById("wifiForm").checked = data.WiFi;
+                                                document.getElementById("disscplForm").checked = data.DisabledCompatible;
+
+                                                UpdateSliderStatus(data.Type);
+                                                document.getElementById('formTitle').innerHTML = "Modify accommodation: <u>" + data.Name + "</u> of arrangement: <u>" + parts[2] + "</u>";
+                                            },
+                                            error: function (jqXhr, textStatus, errorMessage) {
+                                                document.getElementById('formTitle').innerHTML = "Modify accommodation";
+                                                alert("Error while loading original data: " + jqXhr.responseText);
+                                            }
+                                        });
+                                    }
+                                    else
+                                        document.getElementById('formTitle').innerHTML = "Create accommodation for: <u>"+parts[2]+"</u>";
+                                
+                                });
+
+                                function UpdateSliderStatus(selectedType) {
+                                    if (selectedType != "Hotel") {
+                                        document.getElementById('sliderDiv').innerHTML = "";
+                                    }
+                                    else {
+                                        if (document.getElementById('sliderDiv').innerHTML == "") {
+                                            document.getElementById('sliderDiv').innerHTML =
+                                            "<label id=\"sliderLabel\" style=\"font:x-large; color:royalblue; float:left;\" for=\"starsForm\">Stars: </label>" +
+                                            "<input type=\"range\" name=\"starsForm\" id=\"starsForm\" onchange=\"updateVal(this.value)\" class=\"form-control\" value=\"5\" min=\"1\" max=\"5\"; padding-left:50%;\">";
+
+                                            $("#starsForm").val(5);
+                                            updateVal(5);
+                                        }
+                                    }
+                                }
+
+                                function ValidateParams() {
+                                    let errStr = "";
+
+                                    if ($("#nameForm").val() == "") errStr = "Empty name field;\n";
+                                    if ($("#locationForm").val() == "") errStr = "Empty location field;\n";
+                                    if ($("#new_type").val() == "") errStr = "Type not selected;\n";
+                                    if ($("#new_type").val() == "Hotel" && $("#starsForm").val() == "") errStr = "Stars not defined;\n";
+
+                                    return errStr;
+                                }
+
+                                function Accommodation(name, location, type, stars, pool, spa, wiFi, dissComp) {
+
+                                    this.Location = location;
+                                    this.Type = type;
+                                    this.Name = name;
+                                    this.Stars = stars;
+                                    this.Pool = pool;
+                                    this.Spa = spa;
+                                    this.DisabledCompatible = dissComp;
+                                    this.WiFi = wiFi;
+
+                                }
+
+                                function HandleSubmitClick() {
+                                    let errStr;
+                                    if ((errStr = ValidateParams()) == "") {
+                                        let parts = window.localStorage.getItem("targetData").split('_');
+                                        let accommodation = new Accommodation(
+                                            $("#nameForm").val(),
+                                            $("#locationForm").val(),
+                                            $("#new_type").val(),
+                                            $("#starsForm").val(),
+                                            document.getElementById("poolForm").checked,
+                                            document.getElementById("spaForm").checked,
+                                            document.getElementById("wifiForm").checked,
+                                            document.getElementById("disscplForm").checked
+                                        )
+                                        if (window.localStorage.getItem('operation') == 'm') {
+                                            $.ajax({
+                                                type: "POST",
+                                                url: "/api/accommodation/update/" + parts[2] + "/" + parts[3],
+                                                data: JSON.stringify(accommodation),
+                                                contentType: "application/json",
+                                                dataType: "text",
+                                                headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                                success: function (data, status) {
+                                                    alert("Successfully modified");
+                                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home/Accommodations";
+                                                },
+                                                error: function (jqXhr, textStatus, errorMessage) {
+                                                    alert("Submit failed with error: " + jqXhr.responseText);
+                                                }
+
+                                            });
+                                        }
+                                        else if (window.localStorage.getItem('operation') == 'c') {
+                                            $.ajax({
+                                                type: "POST",
+                                                url: "/api/accommodation/addNew/" + parts[2],
+                                                data: JSON.stringify(accommodation),
+                                                contentType: "application/json",
+                                                dataType: "text",
+                                                headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                                success: function (data, status) {
+                                                    alert("Successfully created");
+                                                    document.location.href = window.location.protocol + "//" + window.location.host + "/Home/Accommodations";
+                                                },
+                                                error: function (jqXhr, textStatus, errorMessage) {
+                                                    alert("Submit failed with error: " + jqXhr.responseText);
+                                                }
+                                            });
+                                        }
+                                        else if (window.localStorage.getItem('operation') == 'tn') {
+                                            $.ajax({
+                                                type: "POST",
+                                                url: "/api/accommodation/addNewFree",
+                                                data: JSON.stringify(accommodation),
+                                                contentType: "application/json",
+                                                dataType: "text",
+                                                headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                                success: function (data, status) {
+                                                    alert("Successfully created");
+                                                    RenderEnlistExistingTN();
+                                                    //Anuliraj
+                                                    $("#nameForm").val("");
+                                                    $("#locationForm").val("");
+                                                    $("#new_type").val("");
+                                                    $("#starsForm").val("5");
+                                                    document.getElementById("poolForm").checked=false;
+                                                    document.getElementById("spaForm").checked = false;
+                                                    document.getElementById("wifiForm").checked = false;
+                                                    document.getElementById("disscplForm").checked = false;
+                                                },
+                                                error: function (jqXhr, textStatus, errorMessage) {
+                                                    alert("Submit failed with error: " + jqXhr.responseText);
+                                                }
+                                            });
+                                        }
+                                    }
+                                    else alert(errStr)
+                                }
+
+                            </script>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row">
+                <div class="col-lg-8">
+                    <h3 id="secHeader"></h3>
+                    <div id="secOptDiv" >
+                        <script>
+                            function HandleAccommodationDelete(elem) {
+                                let parts = elem.id.split("_");
+                                $.ajax({
+                                    type: "PUT",
+                                    url: "/api/accommodation/deleteSmp/" + parts[2],
+                                    headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                    success: function (data, status) {
+                                        alert("Successfully deleted");
+                                        RenderEnlistExistingTN();
+                                    },
+                                    error: function (jqXhr, textStatus, errorMessage) {
+                                        alert("Deleting failed with error: " + jqXhr.responseText);
+                                    }
+                                });
+                            }
+
+                            function RenderEnlistExistingTN() {
+
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/api/accommodations/GetAll",
+                                    headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                    success: function (data, status) {
+                                        let newHtml =
+                                        "<table class=\"table\">" +
+                                            "<tr style=\"background-color: #fff4a5;\">" +
+                                                "<th>Name</th>" +
+                                                "<th>Type</th>" +
+                                                "<th>Location</th>" +
+                                                "<th>Stars</th>" +
+                                                "<th>Pool</th>" +
+                                                "<th>Spa</th>" +
+                                                "<th>Dissabled<br>Compatible</th>" +
+                                                "<th>WiFi</th>" +
+                                                "<th colspan=\"2\">&nbsp</th>" +
+                                            "</tr>";
+                                        for (accommodation in data) {
+                                            newHtml += "<tr style=\"background-color: #DAF7A6;\">" +
+                                                "<td>" +
+                                                    "<u>" + data[accommodation].Name + "</u>" +
+                                                "</td>" +
+                                                "<td>" + data[accommodation].Type + "</td>" +
+                                                "<td>" + data[accommodation].Location + "</td>" +
+                                                "<td>" + (data[accommodation].Type != "Hotel" ? "/" : data[accommodation].Stars) + "</td>" +
+                                                "<td>" + (data[accommodation].Pool == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data[accommodation].Spa == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data[accommodation].DisabledCompatible == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" + (data[accommodation].WiFi == true ? "YES" : "NO") + "</td>" +
+                                                "<td>" +
+                                                    "<button onclick=\"HandleAccommodationDelete(this)\" id=\"btn_deleteAccommodation_" + data[accommodation].Name + "\" style=\"color:#CD5C5C;\">Delete </button>&nbsp" +
+                                                "<td>";
+                                            newHtml += "</tr>";
+                                        }
+                                        newHtml += "</table>";
+                                        document.getElementById("secOptDiv").innerHTML = newHtml;
+                                    },
+                                    error: function (jqXhr, textStatus, errorMessage) {
+                                        alert("Failed loading all accommodations with: " + jqXhr.responseText);
+                                    }
+                                });
+                            }
+
+                            function HandleAccommodationAssign(elem) {
+                                let parts = window.localStorage.getItem("targetData").split('_');
+                                $.ajax({
+                                    type: "PUT",
+                                    url: "/api/accommodation/assignToArrangement/" + document.getElementById("assign_list_" + elem.id.split("_")[2]).value + "/" + elem.id.split("_")[2],
+                                    headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                    success: function (data, status) {
+                                        alert("Successfully added");
+                                        window.localStorage.setItem('AccommodationsToShowFor', parts[2]);
+                                        document.location.href = window.location.protocol + "//" + window.location.host + "/Home/Accommodations";
+                                    },
+                                    error: function (jqXhr, textStatus, errorMessage) {
+                                        alert("Assign failed with error: " + jqXhr.responseText);
+                                    }
+                                });
+                            }
+
+                            function setValue(inVal, dl) {
+                                var el = 0;
+                                for (var i = 0; i < dl.options.length; i++) {
+                                    if (dl.options[i].value == inVal) {
+                                        el = i;
+                                        break;
+                                    }
+                                }
+                                dl.selectedIndex = el;
+                            }
+
+                            function RenderAssignFreeC() {
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/api/accommodations/GetAll",
+                                    headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                    success: function (data, status) {
+
+                                        let optionsStr = "";
+                                        $.ajax({
+                                            type: "GET",
+                                            url: "/api/arrangements/incomingNames",
+                                            headers: { 'Authorization': window.localStorage.getItem('TALoginToken') },
+                                            success: function (dataIN, status) {;
+
+                                                let newHtml =
+                                                  "<table class=\"table\">" +
+                                                      "<tr style=\"background-color: #fff4a5;\">" +
+                                                          "<th>Name</th>" +
+                                                          "<th>Type</th>" +
+                                                          "<th>Location</th>" +
+                                                          "<th>Stars</th>" +
+                                                          "<th>Pool</th>" +
+                                                          "<th>Spa</th>" +
+                                                          "<th>Dissabled<br>Compatible</th>" +
+                                                          "<th>WiFi</th>" +
+                                                          "<th colspan=\"4\">Assign to</th>" +
+                                                      "</tr>";
+                                                for (accommodation in data) {
+
+                                                    optionsStr = "<td><select id=\"assign_list_" + data[accommodation].Name + "\" name=\"assign_type\" tabindex=\"1\">";
+
+                                                    for (arrangement in dataIN)
+                                                        optionsStr += "<option value=\"" + dataIN[arrangement] + "\">" + dataIN[arrangement] + "</option>";
+
+                                                    optionsStr += "</select>" +
+                                                        "</td>" +
+                                                        "<td>" +
+                                                            "<button onclick=\"HandleAccommodationAssign(this)\" id=\"btn_assignAccommodation_" + data[accommodation].Name + "\" >Assign</button>" +
+                                                        "</td>";
+
+
+
+                                                    newHtml += "<tr style=\"background-color: #DAF7A6;\">" +
+                                                        "<td>" +
+                                                            "<u>" + data[accommodation].Name + "</u>" +
+                                                        "</td>" +
+                                                        "<td>" + data[accommodation].Type + "</td>" +
+                                                        "<td>" + data[accommodation].Location + "</td>" +
+                                                        "<td>" + (data[accommodation].Type != "Hotel" ? "/" : data[accommodation].Stars) + "</td>" +
+                                                        "<td>" + (data[accommodation].Pool == true ? "YES" : "NO") + "</td>" +
+                                                        "<td>" + (data[accommodation].Spa == true ? "YES" : "NO") + "</td>" +
+                                                        "<td>" + (data[accommodation].DisabledCompatible == true ? "YES" : "NO") + "</td>" +
+                                                        "<td>" + (data[accommodation].WiFi == true ? "YES" : "NO") + "</td>" +
+                                                        "<td>" +
+                                                            optionsStr +
+                                                        "<td>";
+                                                    newHtml += "</tr>";
+                                                }
+                                                newHtml += "</table>";
+                                                document.getElementById("secOptDiv").innerHTML += newHtml;
+
+                                                for (accommodation in data)
+                                                    setValue(window.localStorage.getItem("targetData").split('_')[2], document.getElementById("assign_list_" + data[accommodation].Name));
+                                            },
+                                            error: function (jqXhr, textStatus, errorMessage) {
+                                                alert("Failed loading all arrangements with: " + jqXhr.responseText);
+                                            }
+                                        });
+                                    },
+                                    error: function (jqXhr, textStatus, errorMessage) {
+                                        alert("Failed loading all accommodations with: " + jqXhr.responseText);
+                                    }
+                                });
+                            }
+
+                            $(document).ready(function () {
+                                if (window.localStorage.getItem('operation') == 'c') {
+                                    document.getElementById("secHeader").innerHTML = "All accommodations:";
+                                    RenderAssignFreeC()
+                                }
+                                else if (window.localStorage.getItem('operation') == 'tn') {
+                                    document.getElementById("secHeader").innerHTML = "All accommodations:";
+                                    RenderEnlistExistingTN();
+                                }
+
+                            });
+                        </script>
+                    </div>
+                </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+</body>
+
+
+
+</html>
+
